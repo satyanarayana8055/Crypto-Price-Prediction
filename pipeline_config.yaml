@@ -1,0 +1,47 @@
+airflow:
+  etl_dag:
+    schedule: "@daily"
+    start_date: (2017,1,1)
+    end_date: (2017,12,31)
+    coins:
+      - bitcoin
+    raw_data_path: "/app/data/raw/"
+    processed_data_path: "/app/data/processed/"
+  
+  model_dag:
+    schedule: "@daily"  # Weekly on Sunday at midnight
+    coins:
+      - bitcoin
+    model_path: "/app/data/models/"
+    hyperparams: 
+      n_estimators: [50, 100, 150, 200]
+      max_depth: [null, 5, 10, 15]
+      min_samples_split: [2, 5, 10]
+      min_samples_leaf: [1, 2, 4]
+      max_features: ['sqrt', 'log2', 0.5]
+      evaluation_metrics: ['mae', 'rmse', 'r2']
+    
+  monitor_dag:
+    schedule: "0 0 * * *"  # Daily at midnight
+    coins:
+      - bitcoin
+    metrics_path: '/app/data/processed/metrics/'
+    drift_threshold: 0.5
+    comparison_window: 30
+    alert_emails: ["muddalasatyanarayana96@gmail.com"]
+
+database: 
+  conn_string: "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+  pool_size: 5
+  timeout: 30
+  
+docker:
+  image: "crypto-price-prediction" 
+  ports:
+    - "5000:5000"  
+    - "8080:8080"
+  volumes: 
+    - ./data:/app/data
+    - ./logs:/app/logs
+    - ./dags:/app/dags
+    - ./src:/app/src

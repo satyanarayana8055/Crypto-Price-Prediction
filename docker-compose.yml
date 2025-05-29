@@ -1,0 +1,115 @@
+
+services:
+  postgres:
+    image: postgres:13
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  airflow-webserver:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SERVICE_TYPE: airflow-webserver
+      PYTHONPATH: /app:/app/src   
+      AIRFLOW_HOME: /app/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      AIRFLOW__CORE__DAGS_FOLDER: /app/dags
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+
+    command: bash -c "airflow db migrate && airflow users create \
+      --username admin \
+      --firstname Satya \
+      --lastname Admin \
+      --role Admin \
+      --email muddalasatyanarayana96@gmail.com \
+      --password admin123 && airflow webserver"
+
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/app/dags
+      - ./logs:/app/logs
+      - ./src:/app/src
+      - ./airflow:/app/airflow
+    healthcheck: 
+      test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob  --hostname $(hostname)"]
+      interval: 30s
+      timeout: 10s 
+      retries: 5
+
+  airflow-scheduler:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-webserver:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      SERVICE_TYPE: airflow-scheduler
+      AIRFLOW_HOME: /app/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      AIRFLOW__CORE__DAGS_FOLDER: /app/dags
+      PYTHON_PATH: /app:/app/src
+    
+    command: airflow scheduler
+
+    volumes:
+      - ./dags:/app/dags
+      - ./logs:/app/logs
+      - ./src:/app/src
+      - ./airflow:/app/airflow
+
+    healthcheck: 
+      test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob  --hostname $(hostname)"]
+      interval: 30s
+      timeout: 10s 
+      retries: 5
+      
+  flask:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SERVICE_TYPE: flask
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+      FLASK_DEBUG: 0
+    command: python src/main.py
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./src:/app/src
+
+volumes:
+  postgres_data:

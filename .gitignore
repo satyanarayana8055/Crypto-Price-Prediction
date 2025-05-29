@@ -172,3 +172,48 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Python bytecode and build files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# This are the bypecode file and there are temporary create during execution to speed up process
+# .egg files are create when we run the setup.py file to igrone the tracking of packages
+
+# Environment
+.env 
+.env.local
+*.env
+# .env files contiain secure info we have to ignore it for safety
+
+# Logs 
+logs/
+*.log
+# Then grow often and grows to large it is good to ignore them
+
+# Data
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep 
+!data/processed/.gitkeep
+# This folder keeps the data ignore data has to be secure and files and folders is tracked
+
+# Artifacts
+artifacts/
+# This custom folder create during running of the model as output it should be ignored
+
+# Notebooks
+notebook/EDA/*.ipynb_checkpoints/
+# jupyter create this file automatically it is good ignore for clear repo
+
+# IDE 
+.vscode/
+# It contain person workspace content or setting it is better ignore
+
+# ignoring the template.py file for clear repo
+template.py

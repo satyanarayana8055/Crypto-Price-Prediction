@@ -1,0 +1,75 @@
+# This file is used to install all the required libries at a time and main purpose of there is version compatability issues across different os and environment
+
+# It is a framework and with the help of the we can focus on featrue what we no need to focus on the infrastructure it act like brigde blw ML model logic and frontend 
+Flask==2.2.5
+
+# It is a extenstion of flask for stroing the cache data 
+flask-caching==2.1.0
+# It is used to clean the data manuplate the data 
+pandas==2.2.2
+
+# It is used for the mathematical calculation 
+numpy==1.26.4
+
+# It uses python code to create and read and updata and delete the database 
+sqlalchemy==1.4.46
+
+# It acts like bridge blw postgres and python code and -binary is ideal for the development
+psycopg2-binary==2.9.10
+
+# It is a powerful ML libray for classification and regression tasks
+xgboost==2.0.3 
+
+# It is a ML library for building and evaluating models
+scikit-learn==1.5.1
+
+# It is used to parse(break down the words and analyze  the structure ) and write YAML configuration files
+pyyaml==6.0.1 
+
+# It is used to access the dictionary items like objects using (.) instead of ([])
+python-box==7.1.1
+
+# It is used for catch early by checking fucntion inputs and results if data type is not make it raise error 
+ensure==1.0.4 
+
+#It is used to load the .env variable to the python environment
+python-dotenv==1.0.1 
+
+# It is used to save the model weights and parallel processing
+joblib==1.4.2
+
+# It is HTTP library to make API calls and send HTTP requests
+requests==2.32.3 
+
+# It is workflow orchestration tool to schedule and monitor data pipeline
+apache-airflow==2.9.3 
+
+# It is used for unit tests, and functionaly tests, and complex integration tests for testing the code
+pytest==8.3.2
+
+# It tells which lines of your code were actually run during the tests
+pytest-cov==5.0.0
+
+# It is used to find the error and enforce coding standards like it make to follow the PEP8 style guidelines
+flake8==7.1.1
+
+# It automatically reformats you python code to follow best practices and standard style like PEP8 formate
+black==24.8.0
+
+# It is automaticaly sorts you imports into alphabetical order 
+isort==5.13.2
+
+# It is used to acces the CoinGecko website API
+pycoingecko==3.1.0 
+
+# Evidently is used to monitor and detects data drift and model performance issues
+evidently==0.4.16
+
+# schedule is used to run the job or task in certain time
+schedule==1.2.2
+
+# wheel is used to build python package in wheel formate it is  binary formate and faster and reliable
+wheel==0.44.0
+
+# Installs the current project in editable/develop mode
+# -e .
