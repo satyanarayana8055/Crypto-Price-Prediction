@@ -7,7 +7,7 @@ from pycoingecko import CoinGeckoAPI
 from requests.exceptions import RequestException
 from utils.logger import get_logger
 from utils.helper import ensure_directory, validate_dataframe
-from config.config import COINGECKO_CONFIG, DATA_PATHS
+from config.config import  DATA_PATHS
 
 logger = get_logger('etl')
 
@@ -24,7 +24,7 @@ def extract_coin_data(coin: str, start_date: datetime, end_date: datetime, retri
             data = client.get_coin_market_chart_range_by_id(id=coin, vs_currency='usd', from_timestamp=from_ts, to_timestamp=to_ts)
             prices =data.get('prices', [])
             if not prices:
-                logger.warning(f"No data for {coin} from {start_date.date()} to {(start_date + timedelta(days=30)).date()}")
+                logger.warning(f"No data for {coin} from {start_date.date()} to {end_date.date()}")
                 return None
 
             df = pd.DataFrame(prices, columns=['timestamp', 'price'])
@@ -35,23 +35,38 @@ def extract_coin_data(coin: str, start_date: datetime, end_date: datetime, retri
             df['coin'] = coin
             
             # Load existing csv if available 
-            output_file = os.path.join('/app/data/raw/', f'{coin}_data.csv')
-            ensure_directory('app/data/raw')
-            
+            output_file = os.path.join(DATA_PATHS['raw'], f'{coin}_data.csv')
+
+            try:
+                ensure_directory(DATA_PATHS['raw'])
+            except Exception as e:
+                logger.error(f"Failed to create directory {DATA_PATHS['raw']}: {str(e)}")  
+                raise
+            # Append to existing CSV if it exists          
             if os.path.exists(output_file):
                 old_df = pd.read_csv(output_file, parse_dates=['date'])
                 combined_df = pd.concat([old_df,df])
-                combined_df = combined_df.drop_duplicates(subset='date', keep='first')
+                combined_df = combined_df.drop_duplicates(subset=['date', 'coin'], keep='first')
             else:
                 combined_df = df
             
             combined_df = combined_df.sort_values('date').reset_index(drop=True)
             
             validate_dataframe(combined_df, expected_columns=['date', 'price', 'coin'])
-            combined_df.to_csv(output_file, index=False)
-            logger.info(f"Updated data for {coin} saved to {output_file}")
+            
+            # Save CSV and verify
+            try:
+                combined_df.to_csv(output_file, index=False)
+                if os.path.exists(output_file):
+                    logger.info(f"Successfully saved data for {coin} to {output_file}")
+                else:
+                    logger.error(f"Failed to save data for {coin} to {output_file}: File does not exist")
+                    raise OSError (f"CSV file {output_file} was not created")
+            except Exception as e:
+                logger.error(f"Error saving CSV for {coin} to {output_file}: {str(e)}")
+                raise
             return output_file
-
+        
         except RequestException as e:
             attempt += 1
             logger.warning(f"Attempt {attempt} failed for {coin}: {str(e)}")
@@ -59,22 +74,3 @@ def extract_coin_data(coin: str, start_date: datetime, end_date: datetime, retri
             if attempt == retries:
                 logger.error(f"Failed to extract {coin} data after {retries} attempts")
                 raise
-            
-def extract_all_coins(start_date: datetime, end_date: datetime) -> list:
-    """Extract data for all configured coins"""
-    output_paths = []
-    coins = COINGECKO_CONFIG['coins']
-    for coin in coins:
-        try:
-            output_path = extract_coin_data(coin, start_date, end_date)
-            output_paths.append(output_path)
-        except Exception as e:
-            logger.error(f"Skipping {coin} due to error: {str(e)}")
-            continue
-    return output_paths
-
-if __name__ == "__main__":
-    end_date = datetime.today()
-    start_date = end_date - timedelta(days=364)
-    extract_all_coins(start_date=start_date, end_date=end_date)
-    

@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import yaml
 import os
 import joblib
-from src.scripts.ingestion import ingest_data
 from src.monitoring.drift_analysis import analyze_drift
 from src.monitoring.performance_metrics import log_performance
 from src.scripts.evaluate import evaluate_model
@@ -29,12 +28,6 @@ dag = DAG(
 
 def create_coin_tasks(coin: str):
     """Create monitoring tasks for a coin"""
-    ingest_task = PythonOperator(
-        task_id = f'ingest_{coin}',
-        python_callable=ingest_data,
-        op_args=[coin],
-        dag=dag
-    )
     drift_task = PythonOperator(
         task_id = f'drift_{coin}',
         python_callable=analyze_drift,

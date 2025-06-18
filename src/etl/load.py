@@ -16,11 +16,9 @@ def create_table(cursor, coin: str):
                    id SERIAL PRIMARY KEY,
                    date TIMESTAMP NOT NULL,
                    price FLOAT NOT NULL,
-                   daily_return FLOAT,
-                   ma_7 FLOAT,
-                   ma_14 FLOAT,
                    coin VARCHAR(50) NOT NULL,
-                   version INT DEFAULT 1
+                   version INT DEFAULT 1, 
+                   CONSTRAINT unique_date_coin UNIQUE (date, coin)
                    )
                    """)
     
@@ -33,38 +31,38 @@ def load_to_db(transformed_file: str):
         with get_db_connection(DB_CONFIG) as conn:
             with conn.cursor() as cursor:            
                 create_table(cursor, coin)
+                # Check existing dates to avoid duplicates 
+                cursor.execute(f"SELECT date FROM {table_name}")
+                existing_dates = set(row[0] for row in cursor.fetchall())
+                
+                # Filter out existing dates
+                df['date'] = pd.to_datetime(df['date'])
+                new_data = df[~df['date'].isin(existing_dates)]
+
+                if new_data.empty:
+                    logger.info(f"No new data to load for {coin}")
+                    return 
+                
                 records = [
                     (
                         row['date'],
                         row['price'],
-                        row['daily_return'],
-                        row['ma_7'],
-                        row['ma_14'],
                         row['coin']
                     )
-                    for _, row in df.iterrows()
+                    for _, row in new_data.iterrows()
                 ]
                 query = f""" 
-                        INSERT INTO {table_name} (date, price, daily_return, ma_7, ma_14, coin) VALUES (%s, %s, %s, %s, %s, %s)
+                        INSERT INTO {table_name} (date, price, coin) VALUES (%s, %s, %s)
+                        ON CONFLICT ON CONSTRAINT unique_date_coin DO NOTHING
                         """
                 execute_batch(cursor, query, records, page_size=1000)
+
                 conn.commit()
-                logger.info(f"Loaded {len(df)} records for {coin} to {table_name}")
+                logger.info(f"Loaded {len(new_data)} new records for {coin} to {table_name}")
+  
     except psycopg2.Error as e:
         logger.error(f"Database error loading {transformed_file}: {str(e)}")
         raise
     except Exception as e:
         logger.error(f"Error loading {transformed_file}: {str(e)}")
         raise
-
-def load_all_coins(transformed_files: list):
-    """Load all transformed files"""
-    for file in transformed_files:
-        try: 
-            load_to_db(file)
-        except Exception as e:
-            logger.error(f"Skipping {file} due to error: {str(e)}")
-            continue
-
-if __name__ == "__main__":
-    load_to_db(sys.argv[1])

@@ -1,51 +1,144 @@
-import os
-import sys
-import pandas as pd 
+"""Preprocesses data for ML model"""
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 from utils.logger import get_logger
-from scripts.ingestion import ingest_data
-from scripts.preprocessing import preprocess_data
+from config.config import   DB_CONFIG
+from utils.helper import get_db_connection, load_to_db, truncate_table, create_table, is_new_data
 
 logger = get_logger('model')
 
-def extract_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Extract features like moving averages"""
+def feature_engineering(df: pd.DataFrame):
+    """Extracting features for building model needed features"""
+  
+    # checking the missing and treating them
     try:
-        df['lag_price_1'] = df['price'].shift(1)
-        df['lag_price_2'] = df['price'].shift(2)
-        df['lag_return_1'] = df['daily_return'].shift(1)
+        if not isinstance(df, pd.DataFrame):
+            logger.error(f"Expected pandas DataFrame, got {type(df)}")
+            raise TypeError (f"Input must be a pandas DataFrame, got {type(df)}")
+        for lag in [1, 2, 3, 7, 14]:
+            df[f'lag_{lag}'] = df['price'].shift(lag)
         
-        # Safe rolling calculations (using closed = 'left')
-        df['ma_7'] = df['price'].shift(1).rolling(window=7, min_periods=1, closed='left').mean()
-        df['ma_14'] = df['price'].shift(1).rolling(window=14, min_periods=1, closed='left').mean()
+        # Rolling mean and std
+        df['rolling_mean_3'] = df['price'].rolling(window=3).mean()
+        df['rolling_std_3'] = df['price'].rolling(window=3).std()
+        
+        df['rolling_mean_7'] = df['price'].rolling(window=7).mean()
+        df['rolling_std_7'] = df['price'].rolling(window=7).std()
 
-        # Return to MA ratios
-        df['return_ma_ratio_7'] = df['daily_return'] / (df['ma_7'] + 1e-6 )
-        df['return_ma_ratio_14'] = df['daily_return'] / (df['ma_14'] + 1e-6)
+        df['rolling_max_7'] = df['price'].rolling(window=7).max()
+        df['rolling_min_7'] = df['price'].rolling(window=7).min()
 
-        # Rolling standard deviation as a proxy for volatility
-        df['price_volatility_7'] = df['price'].rolling(window=7).std()
+        # Price change in daily basics and weekly bases
+        df['price_diff'] = df['price'].diff()
+        df['pct_change_1'] = df['price'].pct_change()
+        df['pct_change_7'] = df['price'].pct_change(periods=7)
+        
+        # capturing seasonality with datetime
+        df['day_of_week'] = df['date'].dt.dayofweek
+        df['day_of_month'] = df['date'].dt.day
+        df['month'] = df['date'].dt.month
+        df['is_weekend'] = df['day_of_week'].isin([5, 6]).astype(int)
 
-        # Drop rows with NaN due to rolling and shifting
-        df = df.dropna() 
-        logger.info("Feature extraction completed successfully")
-        return df       
+        # Trending and Volatility indicators
+        df['exp_moving_avg_10'] = df['price'].ewm(span=10, adjust=False).mean()
+        df['volatility_10'] = df['price'].rolling(10).std()
+
+        # Target Feature
+        df['target'] = df['price'].shift(-1)
+        
+        # Drop Null values
+        df = df.dropna()
+
     except Exception as e:
-        logger.error(f"Error extracting features: {str(e)}")
+        logger.error(f"Preprocessing failed: {str(e)}")
         raise
 
-if __name__ == "__main__":
-        try: 
-           coin = sys.argv[1]
-           output_path = sys.argv[2] 
-           df = ingest_data(coin)
-           df, _ = preprocess_data(df)
-           df = extract_features(df)
-           os.makedirs(os.path.dirname(output_path), exist_ok=True)
-           df.to_csv(output_path, index=False)
-           logger.info(f"Feature enriched data saved to: {output_path}")
+    return df
 
-        except Exception as e:
-           logger.error(f"Error in main: {str(e)}")
-           raise
-      
-                       
+def extract_features(coin: str):
+    # connecting to Postgres database 
+    table_name = f'extract_features_{coin}'
+    raw_table = f'preprocessed_{coin}'
+
+    create_query = f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            id SERIAL PRIMARY KEY,
+            date TIMESTAMP NOT NULL,
+            price FLOAT NOT NULL,
+            coin VARCHAR(50) NOT NULL,
+            version INT DEFAULT 1,
+            lag_1 FLOAT,
+            lag_2 FLOAT,
+            lag_3 FLOAT,
+            lag_7 FLOAT,
+            lag_14 FLOAT,
+            rolling_mean_3 FLOAT,
+            rolling_std_3 FLOAT,
+            rolling_mean_7 FLOAT,
+            rolling_std_7 FLOAT,
+            rolling_max_7 FLOAT,
+            rolling_min_7 FLOAT,
+            price_diff FLOAT,
+            pct_change_1 FLOAT,
+            pct_change_7 FLOAT,
+            day_of_week INT,
+            day_of_month INT,
+            month INT,
+            is_weekend INT,
+            exp_moving_avg_10 FLOAT,
+            volatility_10 FLOAT,
+            target FLOAT
+        )
+        """
+    create_table(create_query)
+    
+    try:
+        last_date = is_new_data(coin, table_name)
+    except Exception as e:
+        logger.warning(f"Could not fetch latest date from {table_name}, preceeding with full data reason for it {str(e)}")
+        
+    try:
+        with get_db_connection(DB_CONFIG) as conn:
+            if last_date:
+                query = f"SELECT * FROM  {raw_table} WHERE date > %s"
+                df = pd.read_sql(query, conn, params=[last_date])
+                if df.empty:
+                    logger.warning(f"No new data after {last_date}. Loading full table as fallback.")
+                    None
+            else:
+                df = pd.read_sql(f"SELECT * FROM {raw_table}", conn)
+
+            logger.info(f"Loaded data sucessfully from {raw_table}")
+    except Exception as e:
+        logger.error(f"Load data from {coin}: is failed{str(e)}")
+        raise
+    
+    if df.empty:
+        logger.warning(f"No data for this {coin}")
+        return None
+    
+    # historical = is_historical_data(coin, table_name)
+
+    cleaned_df = feature_engineering(df)
+
+
+
+    insert_query = f"""
+        INSERT INTO {table_name} (date, price, coin, version,
+                    lag_1, lag_2, lag_3, lag_7, lag_14, 
+                    rolling_mean_3, rolling_std_3, rolling_mean_7, 
+                    rolling_std_7, rolling_max_7, rolling_min_7,
+                    price_diff, pct_change_1, pct_change_7,
+                    day_of_week, day_of_month, month, is_weekend,
+                    exp_moving_avg_10, volatility_10, target)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    # Load conditionally
+    if last_date:
+        load_to_db(cleaned_df, insert_query, table_name)
+        logger.info(f"Appended new historical data for {coin} to {table_name}")
+    else:
+        truncate_table(table_name)
+        load_to_db(cleaned_df, insert_query, table_name)
+        logger.info(f"Replaced {table_name} with initial cleaned data for {coin} ")
+    

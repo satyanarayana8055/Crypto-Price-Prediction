@@ -33,6 +33,7 @@ services:
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       AIRFLOW__CORE__DAGS_FOLDER: /app/dags
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+      AIRFLOW__WEBSERVER__BASE_URL: http://localhost:8080
 
     command: bash -c "airflow db migrate && airflow users create \
       --username admin \
@@ -46,9 +47,11 @@ services:
       - "8080:8080"
     volumes:
       - ./dags:/app/dags
-      - ./logs:/app/logs
+      - ./logs:/app/airflow/logs
       - ./src:/app/src
-      - ./airflow:/app/airflow
+      - ./data:/app/data
+      - ./airflow:/app/airflow 
+      - ./pipeline_config.yaml:/app/pipeline_config.yaml
     healthcheck: 
       test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob  --hostname $(hostname)"]
       interval: 30s
@@ -71,15 +74,19 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       AIRFLOW__CORE__DAGS_FOLDER: /app/dags
-      PYTHON_PATH: /app:/app/src
+      PYTHONPATH: /app:/app/src
+      AIRFLOW__WEBSERVER__BASE_URL: http://localhost:8080
+
     
     command: airflow scheduler
 
     volumes:
       - ./dags:/app/dags
-      - ./logs:/app/logs
+      - ./logs:/app/airflow/logs
       - ./src:/app/src
+      - ./data:/app/data
       - ./airflow:/app/airflow
+      - ./pipeline_config.yaml:/app/pipeline_config.yaml
 
     healthcheck: 
       test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob  --hostname $(hostname)"]

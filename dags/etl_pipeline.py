@@ -8,13 +8,14 @@ from src.etl.transform import transform_coin_data
 from src.etl.load import load_to_db
 from src.utils.logger import get_logger
 
-logger = get_logger('etl_pipeline')
-
+logger = get_logger('dags')
+ 
 with open('/app/pipeline_config.yaml', 'r') as f: 
     config = yaml.safe_load(f)
 
 default_args = {
     'owner': 'airflow',
+    'start_date': datetime(2025, 5, 30),
     "retries": 3,
     'retry_delay': timedelta(minutes=1),
     'on_failure_callback': lambda context: logger.error(f"Task failed: {context['task_instance'].task_id}")
@@ -30,8 +31,10 @@ dag = DAG(
 
 def create_coin_tasks(coin: str):
     """Create ETL tasks for a coin"""
-    start_date = ['airflow']['etl_dag']['start_date']
-    end_date = ['airflow']['etl_dag']['end_date']
+    # For initial run, extract 1-year data; for daily runs, extract only the latest day
+    is_initial_run = "{{dag_run.conf.get('initial_run', False)}}"
+    end_date = datetime.today()
+    start_date = end_date - timedelta(days=364 if is_initial_run else 1)
     extract_task = PythonOperator(
         task_id=f'extract_{coin}',
         python_callable=extract_coin_data,

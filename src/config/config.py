@@ -63,10 +63,10 @@ EMAIL_CONFIG = {
 
 # Data paths
 DATA_PATHS = {
-    'raw': BASE_DIR/'data'/'raw',
-    'processed': BASE_DIR/'data'/'processed',
-    'transformed': BASE_DIR/'data'/'model'/'feature_extraction',
-    'model':BASE_DIR/'data'/'model/weights'
+    'raw': Path('/app/data/raw'),
+    'processed': Path('/app/data/processed'),
+    'extract': Path('/app/data/extract'),
+    'model': Path('/app/data/model'),
 }
 
 logger.info("Configuration loaded successfully")

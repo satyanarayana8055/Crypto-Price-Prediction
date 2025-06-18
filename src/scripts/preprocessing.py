@@ -1,27 +1,104 @@
 """Preprocesses data for ML model"""
-import sys
+import os
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler
-from scripts.ingestion import ingest_data
 from utils.logger import get_logger
+from config.config import   DB_CONFIG
+from datetime import datetime, timedelta
+from utils.helper import get_db_connection, load_to_db, truncate_table, create_table, is_new_data
+from scipy.stats.mstats import winsorize
+from airflow.exceptions import AirflowFailException
 
 logger = get_logger('model')
 
-def preprocess_data(df: pd.DataFrame) -> tuple:
-    """Preprocess data by scaling and handling outliers"""
+def clean_data(df: pd.DataFrame):
+    """Preprocess data by scaling and handling outliers, loading from and saving to database"""
+  
+    # checking the missing and treating them
     try:
-        df = df.fillna(method='ffill')
-        df = df[df['price'].between(df['price'].quantile(0.01), df['price'].quantile(0.99))]
-        scaler = StandardScaler()
-        df[['price', 'daily_return', 'ma_7', 'ma_14']] =scaler.fit_transform(df[['price', 'daily_return', 'ma_7', 'ma_14']])
-        logger.info("Preprocessed data")
-        return df, scaler
+        for col in df.columns:
+            if pd.api.types.is_numeric_dtype(df[col]):
+                df[col] = df[col].fillna(df[col].mean()) 
+
+            elif pd.api.types.is_datetime64_any_dtype(df[col]):
+                df[col] = df[col].fillna(method='ffill')
+
+            elif pd.api.types.is_categorical_dtype(df[col]):
+                df[col] = df[col].fillna(df[col].mode()[0])
+        
+        logger.info("Imputate missing values successfully")
+
+        # Dealing with the outlier with IQR method
+        for col in df.columns:
+            if pd.api.types.is_numeric_dtype(df[col]) and col not in ['id', 'version']:
+                df[col] = pd.Series(np.asarray(winsorize(df[col], limits=[0.05, 0.05])))
+        
+        logger.info("Capping the outlier successfully")
+               
     except Exception as e:
-        logger.error(f"Error preprocessing data: {str(e)}")
+        logger.error(f"Preprocessing failed: {str(e)}")
         raise
-if __name__ == "__main__":
-    coin = sys.argv[1] if len(sys.argv) > 1 else None
-    df = ingest_data(coin)
-    df, scaler = preprocess_data(df)
-    output_path = sys.argv[2]
-    df.to_csv(output_path, index=False)
+
+    return df
+
+def preprocess_data(coin: str):
+    # connecting to Postgres database 
+    table_name = f'preprocessed_{coin}'
+    raw_table = f'{coin}_prices'
+
+    create_query = f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            id SERIAL PRIMARY KEY,
+            date TIMESTAMP NOT NULL,
+            price FLOAT NOT NULL,
+            coin VARCHAR(50) NOT NULL,
+            version INT DEFAULT 1
+        )
+        """
+    create_table(create_query)
+    
+    try:
+        last_date = is_new_data(coin, table_name)
+    except Exception as e:
+        logger.warning(f"Could not fetch latest date from {table_name}, preceeding with full dat reason for it {str(e)}")
+        
+    try:
+        with get_db_connection(DB_CONFIG) as conn:
+            if last_date:
+                query = f"SELECT * FROM  {raw_table} WHERE date > %s"
+                df = pd.read_sql(query, conn, params=[last_date])
+                if df.empty:
+                    logger.warning(f"No new data after {last_date}. Loading full table as fallback.")
+                    None
+            else:
+                df = pd.read_sql(f"SELECT * FROM {raw_table}", conn)
+
+            logger.info(f"Loaded data sucessfully from {raw_table}")
+    except Exception as e:
+        logger.error(f"Load data from {coin}: is failed{str(e)}")
+        raise
+    
+    if df.empty:
+        logger.warning(f"No data for this {coin}")
+        return None
+    
+    # historical = is_historical_data(coin, table_name)
+
+    cleaned_df = clean_data(df)
+
+
+
+    insert_query = f"""
+        INSERT INTO {table_name} (date, price, coin, version)
+        VALUES (%s, %s, %s, %s)
+    """
+    # Load conditionally
+    if last_date:
+        load_to_db(cleaned_df, insert_query, table_name)
+        logger.info(f"Appended new historical data for {coin} to {table_name}")
+    else:
+        truncate_table(table_name)
+        load_to_db(cleaned_df,insert_query, table_name)
+        logger.info(f"Replaced {table_name} with initial cleaned data for {coin} ")
+    

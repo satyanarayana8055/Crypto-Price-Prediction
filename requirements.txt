@@ -5,8 +5,9 @@ Flask==2.2.5
 
 # It is a extenstion of flask for stroing the cache data 
 flask-caching==2.1.0
+
 # It is used to clean the data manuplate the data 
-pandas==2.2.2
+pandas==2.2.3
 
 # It is used for the mathematical calculation 
 numpy==1.26.4
@@ -15,16 +16,16 @@ numpy==1.26.4
 sqlalchemy==1.4.46
 
 # It acts like bridge blw postgres and python code and -binary is ideal for the development
-psycopg2-binary==2.9.10
+psycopg2-binary==2.9.9
 
 # It is a powerful ML libray for classification and regression tasks
 xgboost==2.0.3 
 
 # It is a ML library for building and evaluating models
-scikit-learn==1.5.1
+scikit-learn==1.5.2
 
 # It is used to parse(break down the words and analyze  the structure ) and write YAML configuration files
-pyyaml==6.0.1 
+pyyaml==6.0.2 
 
 # It is used to access the dictionary items like objects using (.) instead of ([])
 python-box==7.1.1
@@ -42,7 +43,8 @@ joblib==1.4.2
 requests==2.32.3 
 
 # It is workflow orchestration tool to schedule and monitor data pipeline
-apache-airflow==2.9.3 
+apache-airflow==2.10.2
+apache-airflow-providers-postgres==5.12.0
 
 # It is used for unit tests, and functionaly tests, and complex integration tests for testing the code
 pytest==8.3.2
@@ -70,6 +72,9 @@ schedule==1.2.2
 
 # wheel is used to build python package in wheel formate it is  binary formate and faster and reliable
 wheel==0.44.0
+
+# this mlflow is used to monitoring the perfromance in different hyperparameters and different models
+mlflow==2.12.1
 
 # Installs the current project in editable/develop mode
 # -e .
