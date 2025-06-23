@@ -44,7 +44,7 @@ services:
       - ./src:/app/src
       - ./data:/app/data
       - ./airflow:/app/airflow 
-      - ./pipeline_config.yaml:/app/pipeline_config.yaml
+      - ./dags/dag_config.yaml:/app/dags/dag_config.yaml
     healthcheck: 
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -76,7 +76,7 @@ services:
       - ./src:/app/src
       - ./data:/app/data
       - ./airflow:/app/airflow
-      - ./pipeline_config.yaml:/app/pipeline_config.yaml
+      - ./dags/dag_config.yaml:/app/dags/dag_config.yaml
 
     healthcheck: 
       test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob  --hostname $(hostname)"]
@@ -125,7 +125,7 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - mlflow_data:/app/mlruns
+      - ./mlruns:/app/mlruns
     healthcheck: 
       test: ["CMD-SHELL", "curl", "-f", "http://localhost:5001"]
       interval: 30s
@@ -133,4 +133,3 @@ services:
       retries: 5
 volumes:
   postgres_data:
-  mlflow_data:
