@@ -4,12 +4,10 @@ and configurable parameters. It enables easier parameter tuning and promotes mod
 """
 import os 
 from dotenv import load_dotenv
-from utils.logger import get_logger
 from pathlib import Path
 
 # It is the base folder to get access from outside the src folder 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-logger = get_logger('etl')
 
 # Load environment variables
 load_dotenv(dotenv_path=BASE_DIR /'.env')
@@ -19,7 +17,7 @@ def validate_env_vars():
     required_vars = ['DB_USER','DB_PASSWORD','DB_HOST','DB_PORT','DB_NAME','FLASK_SECRET_KEY']
     missing = [var for var in required_vars if not os.getenv(var)]
     if missing:
-        logger.error(f"Missing enviroment variables: {missing}")
+        print(f"Missing enviroment variables: {missing}")
         raise ValueError(f"Missing enviroment variables:{missing}")
     
 validate_env_vars()
@@ -60,13 +58,31 @@ EMAIL_CONFIG = {
     'user': os.getenv('EMAIL_USER'),
     'password': os.getenv('EMAIL_PASSWORD')
 }
+# Log configuration
+LOG_CONFIG = {
+    'level': os.getenv('LOG_LEVEL','INFO'),
+    'max_bytes':int(os.getenv('LOG_MAX_BYTES',10485760)),
+    'backup_count': int(os.getenv('LOG_BACKUP',5))
+}
 
 # Data paths
 DATA_PATHS = {
     'raw': Path('/app/data/raw'),
     'processed': Path('/app/data/processed'),
     'extract': Path('/app/data/extract'),
-    'model': Path('/app/data/model'),
+    'model_weight': Path ('/app/data/model/weight'),
+    'model_metrics': Path ('/app/data/model/metrics'),
+    'drift_html': Path('/app/data/monitor/drift'),
+    'perform_metrics': Path('/app/data/monitor/performance/')
+    
+    # 'model': BASE_DIR / 'data' / 'model'
 }
 
-logger.info("Configuration loaded successfully")
+
+THRESHOLDS = {
+    'mae': os.getenv('MAE'),
+    'mse': os.getenv('MSE'),
+    'r2' : os.getenv('R2')
+}
+
+print("Configuration loaded successfully")

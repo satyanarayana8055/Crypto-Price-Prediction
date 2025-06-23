@@ -46,8 +46,6 @@ def feature_engineering(df: pd.DataFrame):
         # Target Feature
         df['target'] = df['price'].shift(-1)
         
-        # Drop Null values
-        df = df.dropna()
 
     except Exception as e:
         logger.error(f"Preprocessing failed: {str(e)}")

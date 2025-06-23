@@ -3,17 +3,15 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import yaml
-from src.scripts.preprocessing import preprocess_data
-from src.scripts.feature_extraction import extract_features
-from src.scripts.model import train_model
-from src.scripts.evaluate import evaluate_model
-from src.utils.logger import get_logger
-from src.config.config import DB_CONFIG
-from utils.helper import get_db_connection 
+from scripts.preprocessing import preprocess_data
+from scripts.feature_extraction import extract_features
+from scripts.model import train_model
+from scripts.evaluate import evaluate_model
+from utils.logger import get_logger
 
 logger = get_logger('dags')
 
-with open('/app/pipeline_config.yaml', 'r') as f:  # Use absolute path
+with open('/app/dags/dag_config.yaml', 'r') as f:  # Use absolute path
     config = yaml.safe_load(f)
 
 default_args = {
@@ -33,8 +31,6 @@ dag = DAG(
 
 def create_coin_tasks(coin: str):
     """Create model trianing tasks for a coin"""
-    # Check if 6 months have passed since last run
-    # is_six_month_run = not is_historical_processed(coin)
 
     preprocess_task = PythonOperator(
         task_id=f'preprocess_{coin}',

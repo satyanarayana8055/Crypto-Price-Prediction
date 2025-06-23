@@ -5,7 +5,8 @@ import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from utils.helper import ensure_directory
-from config.path_config import LOG_CONFIG
+from dotenv import load_dotenv
+from config.config import LOG_CONFIG
 
 def get_logger(name: str) -> logging.Logger:
     """Create a logger with rotation

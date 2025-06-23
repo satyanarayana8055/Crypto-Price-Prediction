@@ -1,6 +1,18 @@
+# Use lightweight official Python image
 FROM python:3.10-slim
 
+# Set working directory
 WORKDIR /app
+
+# Install system dependencies (for many python packages we may face compatability issues)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc \
+        libpq-dev \
+        curl \
+        procps \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
 COPY requirements.txt . 
@@ -12,24 +24,21 @@ COPY . .
 # Set environment variable
 ENV AIRFLOW_HOME=/app/airflow 
 ENV PYTHONPATH=/app:/app/src
+ENV MLFLOW_HOME=/app/mlruns
 
-# Install wait-for-it script
-# it install i needed libries and update them and skip installation and updatation for not important libries and 
-# and next commands wait for the to start all images in needed flow and next one clear the catch to reduce the size
+# Expose ports for Airflow webserver, Flask, and MLflow
+EXPOSE 5000 8080 5001
 
-# Install curl first
-RUN apt-get update && apt-get install -y curl
-
-# Download and install wait-for-it
+# Download and install wait-for-it/ it help other container to wait untill another execute
 RUN curl -o /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
     chmod +x /usr/local/bin/wait-for-it.sh
 
 
-EXPOSE 5000 8080
-
-#Copy entrypoint script
+# Copy entrypoint script
 COPY entrypoint.sh /app/entrypoint.sh 
 RUN chmod +x /app/entrypoint.sh
+
+# Default command
 CMD ["/app/entrypoint.sh"]
 
 

@@ -5,6 +5,6 @@ __pycache__
 .Python
 .env
 logs/
-notebook/
-tests/
 .github/
+airflow/
+data/

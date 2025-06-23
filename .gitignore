@@ -199,6 +199,8 @@ logs/
 # Data
 data/raw/*
 data/processed/*
+data/model/metrics
+data/model/weight
 !data/raw/.gitkeep 
 !data/processed/.gitkeep
 # This folder keeps the data ignore data has to be secure and files and folders is tracked
@@ -217,3 +219,6 @@ notebook/EDA/*.ipynb_checkpoints/
 
 # ignoring the template.py file for clear repo
 template.py
+
+# This folder created when mlruns used in terminal
+mlruns

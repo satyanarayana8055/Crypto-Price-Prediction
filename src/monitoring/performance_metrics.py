@@ -2,32 +2,53 @@
 import pandas as pd
 import os
 import sys
+import mlflow
+import requests
 from utils.logger import get_logger
-from config.config import DATA_PATHS
+from config.config import DATA_PATHS, THRESHOLDS
 
 logger = get_logger('monitor')
 
-def log_performance(metrics: dict, coin: str):
-    """Log performance metrics for a coin"""
-    try:
-        metrics_df = pd.DataFrame({
-            'date': [pd.Timestamp.now()],
-            'coin': [coin],
-            'mse': [metrics['mse']],
-            'r2': [metrics['r2']],
-            'mae': [metrics['mae']]
-        })
-        metrics_path = os.path.join(DATA_PATHS['processed'], f'{coin}_metrics.csv')
-        if os.path.exists(metrics_path):
-            existing = pd.read_csv(metrics_path)
-            metrics_df = pd.concat([existing, metrics_df], ignore_index=True)
-        metrics_df.to_csv(metrics_path, index=False)
-        logger.info(f"Logger metrics for {coin} to {metrics_path}")
-    except Exception as e:
-        logger.error(f"Error logged metrics for {coin}: {str(e)}")
-        raise
 
-if __name__ == "__main__":
-    metrics = {'mse': float(sys.argv[1]), 'r2': float(sys.argv[2]), 'mae': float(sys.argv[3])}
-    coin = sys.argv[4]
-    log_performance(metrics, coin)
+def monitor_metrics(coin: str):
+
+    path = os.path.join(DATA_PATHS['model_metrics'],f"{coin}_metrics.csv")
+    df = pd.read_csv(path)
+    
+    # Get the row with the best R² score
+    best_metrics = df.loc[df['r2'].idxmax()]
+    best_metrics_df=best_metrics.to_frame().T
+
+    # Path for performance metrics file
+    output_path = os.path.join(DATA_PATHS['perform_metrics'],f"{coin}_performance_metrics.csv")
+
+    # If file exists, append without header; otherwise, write with header
+    if os.path.exists(output_path):
+        best_metrics_df.to_csv(output_path, mode='a', index=False, header=False)
+    else:
+        best_metrics_df.to_csv(output_path, index=False, header=True)
+
+
+# def monitor_metrics(coin: str):
+
+
+    # # Compare with thresholds
+    # alerts = []
+    # if mae > THRESHOLDS["mae"]:
+    #     alerts.append(f"MAE too high: {mae:.3f} > {THRESHOLDS['mae']}")
+
+    # if mse > THRESHOLDS["mse"]:
+    #     alerts.append(f"Accuracy too low: {mse:.3f} < {THRESHOLDS['mse']}")
+        
+    # if r2 < THRESHOLDS["r2"]:
+    #     alerts.append(f"r2 too low: {r2:.3f} < {THRESHOLDS['r2']}")
+
+    # # Send alerts if needed
+    # if alerts:
+    #     message = "\n".join(alerts)
+    #     send_alert(message)
+    # else:
+    #     print(f"Model performance is within acceptable limits")
+    
+
+

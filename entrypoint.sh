@@ -1,36 +1,42 @@
-#!/bin/sh
-set -eu
+#!/bin/bash
+set -e
 
-# Wait for PostgreSQL to be ready
-wait-for-it.sh "${DB_HOST:-postgres}:${DB_PORT:-5432}" -t 30
+# Wait for Postgres for relevant services
+if [ "$SERVICE_TYPE" != "postgres" ]; then
+  wait-for-it.sh postgres:5432 --timeout=60 -- echo "PostgreSQL is ready"
+fi
 
-# Run the appropriate service based on SERVICE_TYPE
 case "$SERVICE_TYPE" in
-  "flask")
-    echo "Starting Flask application..."
-    exec python -m src.main
-    ;;
-  "airflow-webserver")
-    echo "Starting Airflow webserver..."
-    # Run migrations and create admin user
-    airflow db upgrade
+  airflow-webserver)
+    echo "Running migrations and creating admin user..."
+    airflow db migrate
+
     airflow users create \
       --username admin \
       --firstname Satya \
       --lastname Admin \
       --role Admin \
       --email muddalasatyanarayana96@gmail.com \
-      --password admin123 \
-    || echo "Admin user already exists or creation failed, continuing..."
+      --password admin123 || echo "User may already exist. Skipping."
+
     exec airflow webserver
     ;;
-  "airflow-scheduler")
-    echo "Starting Airflow scheduler..."
-    airflow db upgrade
+  airflow-scheduler)
     exec airflow scheduler
     ;;
+  flask)
+    exec python src/web/main.py
+    ;;
+  mlflow)
+    exec mlflow ui \
+      --host 0.0.0.0 \
+      --port 5001 \
+      --backend-store-uri postgresql+psycopg2://${ML_USER}:${ML_PASSWORD}@postgres:5432/${ML_NAME} \
+      --default-artifact-root /app/mlruns \
+      --gunicorn-opts "--log-level debug"
+    ;;
   *)
-    echo "Unknown SERVICE_TYPE: $SERVICE_TYPE"
+    echo "Unknown service type: $SERVICE_TYPE"
     exit 1
     ;;
 esac

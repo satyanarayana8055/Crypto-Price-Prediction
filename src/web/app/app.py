@@ -3,10 +3,11 @@ from flask import Flask
 from flask_caching import Cache
 from config.config import FLASK_CONFIG
 from utils.logger import get_logger
-from app.routes import init_routes
+from web.app.routes import init_routes
 from flask import Flask, request
 
 logger = get_logger('app')
+
 
 def create_app() -> Flask:
     """Create and configure Flask application"""

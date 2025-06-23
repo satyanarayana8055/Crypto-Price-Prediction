@@ -1,7 +1,7 @@
 """API endpoints for CryptoPredictor Flask app"""
 from flask import render_template, jsonify, request
-from app_services.model_service import predict_price
-from app_services.data_service import get_latest_data
+from web.services.model_service import predict_price
+from web.services.data_service import get_latest_data
 from utils.logger import get_logger
 from config.config import COINGECKO_CONFIG, FLASK_CONFIG
 from functools import wraps

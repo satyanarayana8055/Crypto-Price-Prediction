@@ -17,6 +17,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   airflow-webserver:
     build: .
     depends_on:
@@ -30,30 +31,22 @@ services:
       AIRFLOW_HOME: /app/airflow
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       AIRFLOW__CORE__DAGS_FOLDER: /app/dags
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
       AIRFLOW__WEBSERVER__BASE_URL: http://localhost:8080
 
-    command: bash -c "airflow db migrate && airflow users create \
-      --username admin \
-      --firstname Satya \
-      --lastname Admin \
-      --role Admin \
-      --email muddalasatyanarayana96@gmail.com \
-      --password admin123 && airflow webserver"
-
     ports:
-      - "8080:8080"
+      - "8080:8080" 
     volumes:
       - ./dags:/app/dags
-      - ./logs:/app/airflow/logs
+      - ./airflow/logs:/app/airflow/logs
       - ./src:/app/src
       - ./data:/app/data
       - ./airflow:/app/airflow 
       - ./pipeline_config.yaml:/app/pipeline_config.yaml
     healthcheck: 
-      test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob  --hostname $(hostname)"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s 
       retries: 5
@@ -72,17 +65,14 @@ services:
       AIRFLOW_HOME: /app/airflow
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       AIRFLOW__CORE__DAGS_FOLDER: /app/dags
       PYTHONPATH: /app:/app/src
       AIRFLOW__WEBSERVER__BASE_URL: http://localhost:8080
 
-    
-    command: airflow scheduler
-
     volumes:
       - ./dags:/app/dags
-      - ./logs:/app/airflow/logs
+      - ./airflow/logs:/app/airflow/logs
       - ./src:/app/src
       - ./data:/app/data
       - ./airflow:/app/airflow
@@ -110,7 +100,7 @@ services:
       DB_NAME: ${DB_NAME}
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
       FLASK_DEBUG: 0
-    command: python src/main.py
+
     ports:
       - "5000:5000"
     volumes:
@@ -118,5 +108,29 @@ services:
       - ./logs:/app/logs
       - ./src:/app/src
 
+  mlflow:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    container_name: mlflow
+    env_file:
+      - .env
+    environment:
+      SERVICE_TYPE: mlflow
+      MLFLOW_TRACKING_URI: http://localhost:5001
+      BACKEND_STORE_URI: postgresql+psycopg2://${ML_USER}:${ML_PASSWORD}@postgres:5432/${ML_NAME}
+      ARTIFACT_ROOT: /app/mlruns
+    
+    ports:
+      - "5001:5001"
+    volumes:
+      - mlflow_data:/app/mlruns
+    healthcheck: 
+      test: ["CMD-SHELL", "curl", "-f", "http://localhost:5001"]
+      interval: 30s
+      timeout: 10s 
+      retries: 5
 volumes:
   postgres_data:
+  mlflow_data:

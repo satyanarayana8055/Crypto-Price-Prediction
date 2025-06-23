@@ -15,11 +15,11 @@ airflow:
       - bitcoin
     model_path: "/app/data/models/"
     hyperparams: 
-      n_estimators: [50, 100, 150, 200]
-      max_depth: [null, 5, 10, 15]
-      min_samples_split: [2, 5, 10]
-      min_samples_leaf: [1, 2, 4]
-      max_features: ['sqrt', 'log2', 0.5]
+      n_estimators: [50, 150]
+      max_depth: [5, 10]
+      min_samples_split: [5, 10]
+      min_samples_leaf: [2, 4]
+      max_features: ['log2', 0.5]
   
     evaluation_metrics: ['mae', 'rmse', 'r2']
     
@@ -32,18 +32,4 @@ airflow:
     comparison_window: 30
     alert_emails: ["muddalasatyanarayana96@gmail.com"]
 
-database: 
-  conn_string: "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-  pool_size: 5
-  timeout: 30
-  
-docker:
-  image: "crypto-price-prediction" 
-  ports:
-    - "5000:5000"  
-    - "8080:8080"
-  volumes: 
-    - ./data:/app/data
-    - ./logs:/app/logs
-    - ./dags:/app/dags
-    - ./src:/app/src
+

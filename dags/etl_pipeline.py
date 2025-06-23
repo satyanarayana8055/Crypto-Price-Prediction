@@ -3,14 +3,14 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import yaml
-from src.etl.extract import extract_coin_data
-from src.etl.transform import transform_coin_data
-from src.etl.load import load_to_db
-from src.utils.logger import get_logger
+from etl.extract import extract_coin_data
+from etl.transform import transform_coin_data
+from etl.load import load_to_db
+from utils.logger import get_logger
 
 logger = get_logger('dags')
  
-with open('/app/pipeline_config.yaml', 'r') as f: 
+with open('/app/dags/dag_config.yaml', 'r') as f: 
     config = yaml.safe_load(f)
 
 default_args = {
