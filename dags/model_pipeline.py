@@ -3,10 +3,10 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import yaml
-from scripts.preprocessing import preprocess_data
-from scripts.feature_extraction import extract_features
-from scripts.model import train_model
-from scripts.evaluate import evaluate_model
+from pipeline.preprocessing import preprocess_data
+from pipeline.feature_extraction import extract_features
+from pipeline.model import train_model
+from pipeline.evaluate import evaluate_model
 from utils.logger import get_logger
 
 logger = get_logger('dags')

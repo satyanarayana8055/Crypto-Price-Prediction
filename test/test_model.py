@@ -2,7 +2,7 @@
 import pytest
 import os
 import pandas as pd
-from scripts.model import train_model
+from pipeline.model import train_model
 from config.config import DATA_PATHS
 
 def test_model_prediction():

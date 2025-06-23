@@ -6,7 +6,7 @@ import pandas as pd
 import mlflow
 from utils.logger import get_logger
 from config.config import DB_CONFIG, DATA_PATHS
-from scripts.model import prepare_data
+from pipeline.model import prepare_data
 from utils.helper import get_db_connection
 logger = get_logger('model')
 
