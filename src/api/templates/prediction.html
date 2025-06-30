@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction - Crypto Prediction{% endblock %}
+
+{% block content %}
+<div class="prediction-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i data-lucide="trending-up" class="title-icon"></i>
+            Price Prediction
+        </h1>
+        <div class="coin-selector">
+            <select id="coinSelect" class="coin-select">
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+                <option value="cardano">Cardano (ADA)</option>
+                <option value="solana">Solana (SOL)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Prediction Results -->
+    <div class="prediction-grid">
+        <div class="prediction-card main-prediction">
+            <div class="prediction-header">
+                <h3>24h Price Prediction</h3>
+                <div class="confidence-badge" id="confidenceBadge">
+                    <span id="confidenceValue">85%</span>
+                    <span>Confidence</span>
+                </div>
+            </div>
+            
+            <div class="prediction-content">
+                <div class="current-vs-predicted">
+                    <div class="price-comparison">
+                        <div class="current-price">
+                            <label>Current Price</label>
+                            <span id="currentPricePred">$0.00</span>
+                        </div>
+                        <div class="prediction-arrow">
+                            <i data-lucide="arrow-right" id="predictionArrow"></i>
+                        </div>
+                        <div class="predicted-price">
+                            <label>Predicted Price</label>
+                            <span id="predictedPricePred">$0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="prediction-change">
+                        <div class="change-amount" id="changeAmount">$0.00</div>
+                        <div class="change-percentage" id="changePercentage">0.00%</div>
+                    </div>
+                </div>
+                
+                <button class="generate-btn" onclick="generatePrediction()">
+                    <i data-lucide="zap"></i>
+                    Generate New Prediction
+                </button>
+            </div>
+        </div>
+
+        <div class="prediction-card model-info">
+            <div class="card-header">
+                <h3>Model Information</h3>
+                <i data-lucide="cpu" class="card-icon"></i>
+            </div>
+            <div class="model-details">
+                <div class="detail-item">
+                    <span class="detail-label">Algorithm</span>
+                    <span class="detail-value">XGBoost</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Training Samples</span>
+                    <span class="detail-value" id="trainingSamples">1,000</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Updated</span>
+                    <span class="detail-value" id="lastUpdated">2 hours ago</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Features Used</span>
+                    <span class="detail-value">15</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Importance -->
+    <div class="feature-importance-section">
+        <div class="section-header">
+            <h3>Feature Importance</h3>
+            <div class="info-tooltip">
+                <i data-lucide="info"></i>
+                <div class="tooltip-content">
+                    Shows which features have the most impact on predictions
+                </div>
+            </div>
+        </div>
+        <div class="feature-chart-container">
+            <canvas id="featureChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Prediction History -->
+    <div class="prediction-history">
+        <div class="section-header">
+            <h3>Prediction History</h3>
+            <div class="history-controls">
+                <button class="history-btn active" data-period="24h">24H</button>
+                <button class="history-btn" data-period="7d">7D</button>
+                <button class="history-btn" data-period="30d">30D</button>
+            </div>
+        </div>
+        <div class="history-chart-container">
+            <canvas id="predictionHistoryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Model Metrics -->
+    <div class="metrics-section">
+        <div class="section-header">
+            <h3>Model Performance Metrics</h3>
+        </div>
+        <div class="metrics-cards">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i data-lucide="target"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="accuracyMetric">85.2%</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i data-lucide="bar-chart-2"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="mseMetric">1,250.5</div>
+                    <div class="metric-label">MSE</div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i data-lucide="trending-down"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="maeMetric">28.7</div>
+                    <div class="metric-label">MAE</div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i data-lucide="percent"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="mapeMetric">5.2%</div>
+                    <div class="metric-label">MAPE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/prediction.js') }}"></script>
+{% endblock %}

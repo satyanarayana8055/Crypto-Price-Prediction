@@ -5,7 +5,7 @@ import sys
 import mlflow
 import requests
 from utils.logger import get_logger
-from config.config import DATA_PATHS, THRESHOLDS
+from config.config import DATA_PATHS
 
 logger = get_logger('monitor')
 
@@ -16,7 +16,7 @@ def monitor_metrics(coin: str):
     df = pd.read_csv(path)
     
     # Get the row with the best R² score
-    best_metrics = df.loc[df['r2'].idxmax()]
+    best_metrics = df.loc[df['accuracy'].idxmax()]
     best_metrics_df=best_metrics.to_frame().T
 
     # Path for performance metrics file

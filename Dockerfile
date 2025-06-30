@@ -24,7 +24,6 @@ COPY . .
 # Set environment variable
 ENV AIRFLOW_HOME=/app/airflow 
 ENV PYTHONPATH=/app:/app/src
-ENV MLFLOW_HOME=/app/mlruns
 
 # Expose ports for Airflow webserver, Flask, and MLflow
 EXPOSE 5000 8080 5001

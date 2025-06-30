@@ -8,7 +8,7 @@ from utils.logger import get_logger
 
 logger = get_logger('monitor_pipeline')
 
-with open('/app/dags/dag_config.yaml', 'r') as f: 
+with open('/app/dags/dag_config.yml', 'r') as f: 
     config = yaml.safe_load(f)
 default_args = {
     'owner': 'airflow',

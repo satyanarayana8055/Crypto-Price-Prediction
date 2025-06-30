@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Crypto Prediction{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i data-lucide="settings" class="title-icon"></i>
+            Settings
+        </h1>
+    </div>
+
+    <!-- Settings Sections -->
+    <div class="settings-grid">
+        <!-- General Settings -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3>General Settings</h3>
+                <i data-lucide="sliders" class="card-icon"></i>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Auto Refresh Dashboard</label>
+                        <span class="setting-desc">Automatically refresh data every 30 seconds</span>
+                    </div>
+                    <label class="toggle-label">
+                        <input type="checkbox" class="toggle-input" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Theme</label>
+                        <span class="setting-desc">Choose your preferred theme</span>
+                    </div>
+                    <select class="setting-select">
+                        <option value="dark" selected>Dark</option>
+                        <option value="light">Light</option>
+                        <option value="auto">Auto</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Default Coin</label>
+                        <span class="setting-desc">Default cryptocurrency to display</span>
+                    </div>
+                    <select class="setting-select">
+                        <option value="bitcoin" selected>Bitcoin (BTC)</option>
+                        <option value="ethereum">Ethereum (ETH)</option>
+                        <option value="cardano">Cardano (ADA)</option>
+                        <option value="solana">Solana (SOL)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Settings -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3>Model Settings</h3>
+                <i data-lucide="cpu" class="card-icon"></i>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Auto Retrain</label>
+                        <span class="setting-desc">Automatically retrain models when drift is detected</span>
+                    </div>
+                    <label class="toggle-label">
+                        <input type="checkbox" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Prediction Frequency</label>
+                        <span class="setting-desc">How often to generate new predictions</span>
+                    </div>
+                    <select class="setting-select">
+                        <option value="15">Every 15 minutes</option>
+                        <option value="30" selected>Every 30 minutes</option>
+                        <option value="60">Every hour</option>
+                        <option value="120">Every 2 hours</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Model Validation</label>
+                        <span class="setting-desc">Validation split for model training</span>
+                    </div>
+                    <select class="setting-select">
+                        <option value="0.1">10%</option>
+                        <option value="0.2" selected>20%</option>
+                        <option value="0.3">30%</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Settings -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3>Data Settings</h3>
+                <i data-lucide="database" class="card-icon"></i>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Data Source</label>
+                        <span class="setting-desc">Primary data source for crypto prices</span>
+                    </div>
+                    <select class="setting-select">
+                        <option value="coingecko" selected>CoinGecko</option>
+                        <option value="coinmarketcap">CoinMarketCap</option>
+                        <option value="binance">Binance API</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Historical Data Range</label>
+                        <span class="setting-desc">How much historical data to use for training</span>
+                    </div>
+                    <select class="setting-select">
+                        <option value="30">30 days</option>
+                        <option value="90" selected>90 days</option>
+                        <option value="180">180 days</option>
+                        <option value="365">1 year</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Data Backup</label>
+                        <span class="setting-desc">Automatically backup data daily</span>
+                    </div>
+                    <label class="toggle-label">
+                        <input type="checkbox" class="toggle-input" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3>Notifications</h3>
+                <i data-lucide="bell" class="card-icon"></i>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Email Notifications</label>
+                        <span class="setting-desc">Send email alerts for important events</span>
+                    </div>
+                    <label class="toggle-label">
+                        <input type="checkbox" class="toggle-input" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Email Address</label>
+                        <span class="setting-desc">Where to send notification emails</span>
+                    </div>
+                    <input type="email" class="setting-input" placeholder="your-email@example.com">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Notification Types</label>
+                        <span class="setting-desc">Choose which events trigger notifications</span>
+                    </div>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span class="checkbox-text">Model accuracy drops</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" checked>
+                            <span class="checkbox-text">Data drift detected</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span class="checkbox-text">System errors</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span class="checkbox-text">Daily reports</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Settings -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3>API Configuration</h3>
+                <i data-lucide="key" class="card-icon"></i>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>API Rate Limit</label>
+                        <span class="setting-desc">Maximum requests per minute</span>
+                    </div>
+                    <input type="number" class="setting-input" value="60" min="10" max="1000">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Request Timeout</label>
+                        <span class="setting-desc">Timeout for API requests (seconds)</span>
+                    </div>
+                    <input type="number" class="setting-input" value="10" min="5" max="60">
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Retry Attempts</label>
+                        <span class="setting-desc">Number of retry attempts for failed requests</span>
+                    </div>
+                    <input type="number" class="setting-input" value="3" min="1" max="10">
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3>System Information</h3>
+                <i data-lucide="info" class="card-icon"></i>
+            </div>
+            <div class="settings-content">
+                <div class="info-item">
+                    <span class="info-label">Application Version</span>
+                    <span class="info-value">v1.0.0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Python Version</span>
+                    <span class="info-value">3.9.7</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">XGBoost Version</span>
+                    <span class="info-value">1.7.3</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Database Size</span>
+                    <span class="info-value">245 MB</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Backup</span>
+                    <span class="info-value">Today, 03:00 AM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="settings-footer">
+        <button class="save-btn" onclick="saveSettings()">
+            <i data-lucide="save"></i>
+            Save Settings
+        </button>
+        <button class="reset-btn" onclick="resetSettings()">
+            <i data-lucide="rotate-ccw"></i>
+            Reset to Defaults
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}

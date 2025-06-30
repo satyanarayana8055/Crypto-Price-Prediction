@@ -45,7 +45,7 @@ def clean_data(df: pd.DataFrame):
 def preprocess_data(coin: str):
     # connecting to Postgres database 
     table_name = f'preprocessed_{coin}'
-    raw_table = f'{coin}_prices'
+    raw_table = f'prices_{coin}'
 
     create_query = f"""
         CREATE TABLE IF NOT EXISTS {table_name} (
@@ -62,17 +62,17 @@ def preprocess_data(coin: str):
         last_date = is_new_data(coin, table_name)
     except Exception as e:
         logger.warning(f"Could not fetch latest date from {table_name}, preceeding with full dat reason for it {str(e)}")
-        
+        last_date = None
     try:
         with get_db_connection(DB_CONFIG) as conn:
             if last_date:
-                query = f"SELECT * FROM  {raw_table} WHERE date > %s"
+                query = f"SELECT timestamp, price, coin FROM  {raw_table} WHERE timestamp > %s"
                 df = pd.read_sql(query, conn, params=[last_date])
                 if df.empty:
                     logger.warning(f"No new data after {last_date}. Loading full table as fallback.")
-                    None
+                    return None
             else:
-                df = pd.read_sql(f"SELECT * FROM {raw_table}", conn)
+                df = pd.read_sql(f"SELECT timestamp, price, coin FROM {raw_table}", conn)
 
             logger.info(f"Loaded data sucessfully from {raw_table}")
     except Exception as e:
@@ -82,9 +82,8 @@ def preprocess_data(coin: str):
     if df.empty:
         logger.warning(f"No data for this {coin}")
         return None
-    
-    # historical = is_historical_data(coin, table_name)
-
+    df.rename(columns={"timestamp": "date"}, inplace=True)
+    df["version"] = 1
     cleaned_df = clean_data(df)
 
 

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Crypto Prediction{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="page-title">
+                <i data-lucide="bar-chart-3" class="title-icon"></i>
+                Dashboard
+            </h1>
+            <div class="coin-selector">
+                <select id="coinSelect" class="coin-select">
+                    <option value="bitcoin">Bitcoin (BTC)</option>
+                    <option value="ethereum">Ethereum (ETH)</option>
+                    <option value="cardano">Cardano (ADA)</option>
+                    <option value="solana">Solana (SOL)</option>
+                </select>
+            </div>
+        </div>
+        <div class="live-indicator">
+            <div class="pulse-dot"></div>
+            <span>Live Data</span>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card price-card">
+            <div class="stat-header">
+                <h3>Current Price</h3>
+                <i data-lucide="dollar-sign" class="stat-icon"></i>
+            </div>
+            <div class="stat-value" id="currentPrice">$0.00</div>
+            <div class="stat-change" id="priceChange">+0.00%</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3>Market Cap</h3>
+                <i data-lucide="pie-chart" class="stat-icon"></i>
+            </div>
+            <div class="stat-value" id="marketCap">$0.00</div>
+            <div class="stat-sub">Total value</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3>24h Volume</h3>
+                <i data-lucide="activity" class="stat-icon"></i>
+            </div>
+            <div class="stat-value" id="volume24h">$0.00</div>
+            <div class="stat-sub">Trading volume</div>
+        </div>
+
+        <div class="stat-card prediction-card">
+            <div class="stat-header">
+                <h3>24h Prediction</h3>
+                <i data-lucide="trending-up" class="stat-icon"></i>
+            </div>
+            <div class="stat-value" id="predictedPrice">$0.00</div>
+            <div class="stat-change" id="predictionChange">+0.00%</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Price History</h3>
+                <div class="chart-controls">
+                    <button class="chart-btn" data-period="30">30D</button>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="model-performance">
+            <div class="performance-header">
+                <h3>Model Performance</h3>
+                <div class="refresh-btn" onclick="refreshMetrics()">
+                    <i data-lucide="refresh-cw"></i>
+                </div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <span class="metric-label">Accuracy</span>
+                    <span class="metric-value" id="modelAccuracy">85%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">MAE</span>
+                    <span class="metric-value" id="modelMAE">28.7</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">R² Score</span>
+                    <span class="metric-value" id="modelR2">0.82</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">MAPE</span>
+                    <span class="metric-value" id="modelMAPE">5.2%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+        <div class="activity-header">
+            <h3>Recent Activity</h3>
+            <button class="view-all-btn">View All</button>
+        </div>
+        <div class="activity-list" id="activityList">
+            <div class="activity-item">
+                <div class="activity-icon success">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Model Update Completed</div>
+                    <div class="activity-time">2 minutes ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon info">
+                    <i data-lucide="info"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">New prediction generated</div>
+                    <div class="activity-time">15 minutes ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon warning">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Data drift detected</div>
+                    <div class="activity-time">1 hour ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

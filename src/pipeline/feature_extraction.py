@@ -1,8 +1,9 @@
-"""Preprocesses data for ML model"""
+"""Extraction data for ML model"""
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from utils.logger import get_logger
-from config.config import   DB_CONFIG
+from config.config import   DB_CONFIG, DATA_PATHS
+import os
 from utils.helper import get_db_connection, load_to_db, truncate_table, create_table, is_new_data
 
 logger = get_logger('model')
@@ -94,7 +95,7 @@ def extract_features(coin: str):
         last_date = is_new_data(coin, table_name)
     except Exception as e:
         logger.warning(f"Could not fetch latest date from {table_name}, preceeding with full data reason for it {str(e)}")
-        
+        last_date = None
     try:
         with get_db_connection(DB_CONFIG) as conn:
             if last_date:
@@ -102,10 +103,9 @@ def extract_features(coin: str):
                 df = pd.read_sql(query, conn, params=[last_date])
                 if df.empty:
                     logger.warning(f"No new data after {last_date}. Loading full table as fallback.")
-                    None
+                    return None
             else:
                 df = pd.read_sql(f"SELECT * FROM {raw_table}", conn)
-
             logger.info(f"Loaded data sucessfully from {raw_table}")
     except Exception as e:
         logger.error(f"Load data from {coin}: is failed{str(e)}")
@@ -115,9 +115,9 @@ def extract_features(coin: str):
         logger.warning(f"No data for this {coin}")
         return None
     
-    # historical = is_historical_data(coin, table_name)
-
     cleaned_df = feature_engineering(df)
+    # features_path = os.path.join(DATA_PATHS['processed'],f"extract_features_{coin}.csv")
+    # cleaned_df.to_csv(features_path, index=False)
 
 
 

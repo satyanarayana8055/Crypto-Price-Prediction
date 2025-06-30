@@ -43,8 +43,8 @@ services:
       - ./airflow/logs:/app/airflow/logs
       - ./src:/app/src
       - ./data:/app/data
+      - ./data/processed:/app/data/processed
       - ./airflow:/app/airflow 
-      - ./dags/dag_config.yaml:/app/dags/dag_config.yaml
     healthcheck: 
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -75,8 +75,8 @@ services:
       - ./airflow/logs:/app/airflow/logs
       - ./src:/app/src
       - ./data:/app/data
+      - ./data/processed:/app/data/processed
       - ./airflow:/app/airflow
-      - ./dags/dag_config.yaml:/app/dags/dag_config.yaml
 
     healthcheck: 
       test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob  --hostname $(hostname)"]
@@ -92,6 +92,7 @@ services:
     env_file:
       - .env
     environment:
+      APP_ENV: production 
       SERVICE_TYPE: flask
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -124,8 +125,6 @@ services:
     
     ports:
       - "5001:5001"
-    volumes:
-      - ./mlruns:/app/mlruns
     healthcheck: 
       test: ["CMD-SHELL", "curl", "-f", "http://localhost:5001"]
       interval: 30s
@@ -133,3 +132,4 @@ services:
       retries: 5
 volumes:
   postgres_data:
+     

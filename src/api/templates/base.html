@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Crypto Price Prediction Dashboard{% endblock %}</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-dark text-light">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i data-lucide="trending-up" class="brand-icon"></i>
+                <span class="brand-text">CryptoPredictAI</span>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/prediction" class="nav-link {% if request.endpoint == 'main.prediction' %}active{% endif %}">
+                    <i data-lucide="trending-up"></i>
+                    <span>Prediction</span>
+                </a>
+                <a href="/data-drift" class="nav-link {% if request.endpoint == 'main.data_drift' %}active{% endif %}">
+                    <i data-lucide="alert-triangle"></i>
+                    <span>Data Drift</span>
+                </a>
+                <a href="/alerts" class="nav-link {% if request.endpoint == 'main.alerts' %}active{% endif %}">
+                    <i data-lucide="bell"></i>
+                    <span>Alerts</span>
+                </a>
+                <a href="/settings" class="nav-link {% if request.endpoint == 'main.settings' %}active{% endif %}">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            
+            <div class="nav-toggle" onclick="toggleNav()">
+                <i data-lucide="menu"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 CryptoPredictAI. Real-time crypto price prediction system.</p>
+            <div class="footer-status">
+                <div class="status-indicator"></div>
+                <span>Live Data Active</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+    
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+    </script>
+</body>
+</html>

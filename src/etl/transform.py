@@ -1,6 +1,5 @@
 """Transforms raw cryptocurrency data"""
 import os
-import sys
 import pandas as pd
 from utils.helper import ensure_directory, validate_dataframe
 from utils.logger import get_logger
@@ -13,17 +12,30 @@ def transform_coin_data(raw_file: str) -> str:
     try:
         df = pd.read_csv(raw_file)
         coin = df['coin'].iloc[0]
-        validate_dataframe(df, expected_columns=['date', 'price', 'coin'])
+
+        expected_cols = [
+            'coin', 'timestamp', 'price', 'market_cap', 'volume',
+            'price_change_24h', 'price_change_percentage_24h'
+        ]
+        validate_dataframe(df, expected_columns=expected_cols)
+
         # Data cleaning steps
-        df = df.dropna(subset=['price', 'date']) # Remove rows with missing critical data
+        df = df.dropna(subset=['price', 'timestamp']) # Remove rows with missing critical data
         df = df[df['price'] > 0]
-        df = df.sort_values('date') # Ensure chronogical order
+        df = df[df['volume'] >= 0]
 
         # Add minimal transformations if needed (e.g., rounging for consistency)
-        df['price'] = df['price'].round(2)
+        df['price'] = df['price'].astype(float).round(2)
+        df['volume'] = df['volume'].astype(float).round(2)
+        df['market_cap'] = df['market_cap'].astype(float).round(2)
+        df['price_change_24h'] = df['price_change_24h'].astype(float).round(2)
+        df['price_change_percentage_24h'] = df['price_change_percentage_24h'].astype(float).round(2)
 
-        output_file = os.path.join(DATA_PATHS['processed'],f'{coin}_transformed.csv')
-        ensure_directory(DATA_PATHS['processed'])
+        # Ensure chronogical order
+        df = df.sort_values('timestamp') 
+
+        output_file = os.path.join(DATA_PATHS['transfrom'],f'{coin}_transformed.csv')
+        ensure_directory(DATA_PATHS['transfrom'])
         df.to_csv(output_file, index=False)
         logger.info(f"Transformed {coin} data to {output_file}")
         return output_file

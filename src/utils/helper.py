@@ -5,21 +5,27 @@ import psycopg2
 import re
 from pathlib import Path
 from contextlib import contextmanager # Decorator to write custom context managers using generator functions instead of classes
-from config.config import DATA_PATHS, DB_CONFIG
+from config.config import DATA_PATHS, DB_CONFIG, DB_API_CONFIG
 from datetime import datetime, timedelta
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.exceptions import AirflowFailException
 from typing import Optional
+from psycopg2 import Error as PsycopgError
 
-def ensure_directory(path: str):
+def ensure_directory(path: str | Path):
     """Create directory if it doesn't exist."""
-    # It is the base folder to get access from outside the src folder 
-    
-    dir_path = DATA_PATHS.get(path, Path(path))
-    if not isinstance (dir_path, Path):
-        dir_path = Path(dir_path)
-    if not dir_path.exists():
-        dir_path.mkdir(parents=True, exist_ok=True)
+    try:
+        dir_path = Path(path) if not isinstance(path, Path) else path
+        print(f"Ensuring directory: {dir_path}")
+        if not dir_path.exists():
+            print(f"Creating directory: {dir_path}")
+            dir_path.mkdir(parents=True, exist_ok=True)
+        else:
+            print(f"Directory already exists: {dir_path}")
+    except Exception as e:
+        print(f"Error creating directory {dir_path}")
+        raise
+
 
 def validate_dataframe(df: pd.DataFrame, expected_columns: list):
     """Validate DataFrame structure it ensure the data is correct extracted base on our requirements"""
@@ -101,7 +107,7 @@ def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
         hook = PostgresHook(postgres_conn_id='my_postgres_conn_id')
         conn = hook.get_conn()
         cursor = conn.cursor()
-        data = list(df.drop(columns=['id']).itertuples(index=False, name=None))
+        data = list(df.drop(columns=['id'], errors='ignore').itertuples(index=False, name=None))
         cursor.executemany(insert_query, data)
         conn.commit()
         print(f"Inserted {cursor.rowcount} rows into {table_name}")
@@ -115,79 +121,51 @@ def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
         if conn:
             conn.close()
 
-# def gen_next_version_path(base_dir: str, coin: str) -> str:
-#     Path(base_dir).mkdir(parents=True, exist_ok=True)
-#     existing_files = os.listdir(base_dir)
-#     version_pattern = re.compile(rf"{coin}_model_v(\d+)\.pkl")
-#     versions = []
+def create_api_table(create_query: str):
+    """Create a table in PostgreSQL."""
 
-#     for f in existing_files:
-#         match = version_pattern.match(f)
-#         if match:
-#             versions.append(int(match.group(1)))
-    
-#     next_version = max(versions, default=0) + 1
-#     file_name = f"{coin}_model_v{next_version}.pkl"
+    try:
+        with get_db_connection(DB_API_CONFIG) as conn:
+            cursor = conn.cursor()
+            cursor.execute(create_query)
+            conn.commit()
+            print(f"Table created or verified successfully")
+    except PsycopgError as e:
+        print(f"Failed to create table: {str(e)}")
+        raise Exception(f"Failed to create table: {str(e)}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+            print("Database connection closed")
 
-#     return os.path.join(base_dir, file_name)
+def load_api_db(df: pd.DataFrame, insert_query: str, table_name: str):
+    """Load a DataFrame into a PostgreSQL table without Airflow dependency."""
+    conn = None
+    cursor = None
+    try:
+        with get_db_connection(DB_API_CONFIG) as conn:
 
-# def is_historical_data(coin: str, table_name: str) -> bool:
+            cursor = conn.cursor()
 
-#     """Check if historical data is exists for the coin"""
+            # Convert DataFrame to list of tuples, excluding 'id' column if present
+            data = list(df.drop(columns=['id'], errors='ignore').itertuples(index=False, name=None))
 
-#     try: 
-#         with get_db_connection(DB_CONFIG) as conn:
-#             df = pd.read_sql(f"SELECT * FROM {table_name}", conn)
-#             if df.empty:
-#                 return False
-#             df['date'] = pd.to_datetime(df['date'])
-#             recent_df = df.sort_values(by='date').tail(545)
-#             earlier_date = recent_df['date'].min()
+            # Execute the insert query
+            cursor.executemany(insert_query, data)
+            conn.commit()
+            print(f"Inserted {cursor.rowcount} rows into {table_name}")
 
-#             # if earlier_date - recent_df[0] == timedelta(days=180):
-#             today = datetime.today()
-#             half_annual = today - timedelta(days=180)
-#             one_year = timedelta(days=365)
+    except PsycopgError as e:
+        if conn:
+            conn.rollback()
+        print(f"Failed to insert into {table_name}: {str(e)}")
+        raise Exception(f"Failed to insert into {table_name}: {str(e)}")
 
-#             if (half_annual - earlier_date) >= one_year:
-#                 return True
-#             else:
-#                 return False
-                  
-#     except Exception as e:
-#         raise ValueError(f"Error checking historical data for {coin}: {str(e)}")
-
-# """if you want to connect the trucate and load_db in modular way this code can be usefull"""
-# from contextlib import contextmanager
-# from airflow.hooks.postgres_hook import PostgresHook
-# import logging
-
-# logger = logging.getLogger(__name__)
-
-# @contextmanager
-# def get_db_cursor(postgres_conn_id='my_postgres_conn_id'):
-#     """Context manager to get a Postgres cursor and connection with automatic cleanup."""
-#     hook = PostgresHook(postgres_conn_id=postgres_conn_id)
-#     conn = None
-#     cursor = None
-#     try:
-#         conn = hook.get_conn()
-#         cursor = conn.cursor()
-#         yield cursor, conn
-#         conn.commit()
-#     except Exception as e:
-#         if conn:
-#             conn.rollback()
-#         logger.error(f"Database error: {str(e)}")
-#         raise
-#     finally:
-#         if cursor:
-#             cursor.close()
-#         if conn:
-#             conn.close()
-
-# def truncate_table(table_name: str):
-#     """Truncate a table using the context manager."""
-#     with get_db_cursor() as (cursor, conn):
-#         cursor.execute(f"TRUNCATE TABLE {table_name}")
-#         logger.info(f"Truncated existing data from {table_name}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+            print(f"Database connection closed for {table_name}")

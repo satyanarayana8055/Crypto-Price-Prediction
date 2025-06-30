@@ -25,7 +25,7 @@ case "$SERVICE_TYPE" in
     exec airflow scheduler
     ;;
   flask)
-    exec python src/web/main.py
+    exec python src/api/app.py
     ;;
   mlflow)
     exec mlflow ui \

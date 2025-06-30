@@ -14,7 +14,7 @@ load_dotenv(dotenv_path=BASE_DIR /'.env')
 
 def validate_env_vars():
     """Validate required environment variables"""
-    required_vars = ['DB_USER','DB_PASSWORD','DB_HOST','DB_PORT','DB_NAME','FLASK_SECRET_KEY']
+    required_vars = ['DB_USER','DB_PASSWORD','DB_HOST','DB_PORT','DB_NAME']
     missing = [var for var in required_vars if not os.getenv(var)]
     if missing:
         print(f"Missing enviroment variables: {missing}")
@@ -26,6 +26,7 @@ validate_env_vars()
 # For code flexibilty we can add any coin name without changing src code and it create the table for it
 PACKAGE_NAME = "cryptoPredictor"
 COINS = os.getenv('COINGECKO_COINS','bitcoin').split(',')
+COINS = [coin.strip() for coin in COINS]  
 TABLE_NAME = {coin: f"{coin}_prices" for coin in COINS}
 
 # Database configuration
@@ -37,27 +38,15 @@ DB_CONFIG = {
     'database': os.getenv('DB_NAME')
 }
 
-# Flask configuration
-FLASK_CONFIG = {
-    'secret_key': os.getenv('FLASK_SECRET_KEY',None), # It get values from .env if not the default values are given to maintain clean and error prevention
-    'debug': os.getenv('FLASK_ENV', 'development') == 'development', # In this also defalut value if value is equals then debug is True not Debug is False it is for developement and production
-    'cache_timeout': 300
- }
-
-# CoinGecko API configuration
-COINGECKO_CONFIG = {
-    'api_key': os.getenv('COINGECKO_API_KEY', None),
-    'base_url': 'https://api.coingecko.com/api/v3',
-    'coins': COINS
+# Database configuration
+DB_API_CONFIG = {
+    'user': os.getenv('API_USER'),
+    'password': os.getenv('API_PASSWORD'),
+    'host': os.getenv('API_HOST'),
+    'port': os.getenv('API_PORT'),
+    'database': os.getenv('API_NAME')
 }
 
-# Email configuration
-EMAIL_CONFIG = {
-    'host': os.getenv('EMAIL_HOST', 'smtp.gmail.com'),
-    'port': os.getenv('EMAIL_PORT',587),
-    'user': os.getenv('EMAIL_USER'),
-    'password': os.getenv('EMAIL_PASSWORD')
-}
 # Log configuration
 LOG_CONFIG = {
     'level': os.getenv('LOG_LEVEL','INFO'),
@@ -67,17 +56,14 @@ LOG_CONFIG = {
 
 # Data paths
 DATA_PATHS = {
-    'raw': Path('/app/data/raw'),
-    'processed': Path('/app/data/processed'),
-    'extract': Path('/app/data/extract'),
-    'model_weight': Path ('/app/data/model/weight'),
-    'model_metrics': Path ('/app/data/model/metrics'),
-    'drift_html': Path('/app/data/monitor/drift'),
-    'perform_metrics': Path('/app/data/monitor/performance/')
-    
-    # 'model': BASE_DIR / 'data' / 'model'
+    'raw': BASE_DIR / 'data' / 'raw',
+    'transfrom': BASE_DIR / 'data' / 'transfrom',
+    'processed': BASE_DIR / 'data' / 'processed',
+    'model_weight': BASE_DIR / 'data' / 'model' / 'weight',
+    'model_metrics': BASE_DIR / 'data' / 'model' / 'metrics',
+    'drift_html': BASE_DIR / 'data' / 'monitor' / 'drift',
+    'perform_metrics': BASE_DIR / 'data' / 'monitor' / 'performance'
 }
-
 
 THRESHOLDS = {
     'mae': os.getenv('MAE'),
@@ -85,4 +71,57 @@ THRESHOLDS = {
     'r2' : os.getenv('R2')
 }
 
+class Web:
+    "WEB base configuration class"
+
+    # Flask settings 
+    SECRET_KEY = os.getenv('FLASK_SECRET_KEY') or 'crypto-predict-secret-key-2025'
+    DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    HOST = os.getenv('FLASK_HOST', '0.0.0.0')
+    PORT = int(os.getenv('FLASK_PORT', 5000))
+
+    # Database settings
+    DATABASE_PATH = os.getenv('DATABASE_PATH')
+    CACHE_DURATION = os.getenv('CACHE_DURATION')
+    
+    # Email settings for notifications
+    SMTP_SERVER = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+    SMTP_PORT = os.getenv('EMAIL_PORT', 587)
+    EMAIL_USER = os.getenv('EMAIL_USER')
+    EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+    NOTIFICATION_EMAIL = os.getenv('NOTIFICATION_EMAIL')
+    
+    # API settings 
+    COINGECKO_API_URL = 'https://api.coingecko.com/api/v3'
+    COINGECKO_API_KEY = os.getenv('COINGECKO_API_KEY')
+    API_TIMEOUT = int(os.getenv('API_TIMEOUT', 10))
+ 
+    # Cache settings
+    CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
+
+    # Security settings
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', '*').split(',')
+
+class DevelopementConfig(Web):
+    """Development configuration"""
+    DEBUG = True
+
+class ProductionConfig(Web):
+    """Production configuration"""
+    DEBUG = True
+
+class TestingConfig(Web):
+    """Production configuration"""
+    TESTING = True
+    DATABASE_PATH = ':memory:'
+
+# Configuration dictionary
+config = {
+    'development': DevelopementConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig,
+    'default': DevelopementConfig
+}
+
 print("Configuration loaded successfully")
+

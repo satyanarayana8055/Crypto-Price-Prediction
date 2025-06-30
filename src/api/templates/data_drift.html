@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Data Drift - Crypto Prediction{% endblock %}
+
+{% block content %}
+<div class="drift-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i data-lucide="alert-triangle" class="title-icon"></i>
+            Data Drift Monitoring
+        </h1>
+        <div class="coin-selector">
+            <select id="coinSelect" class="coin-select">
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+                <option value="cardano">Cardano (ADA)</option>
+                <option value="solana">Solana (SOL)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Drift Status Cards -->
+    <div class="drift-status-grid">
+        <div class="status-card">
+            <div class="status-header">
+                <h3>Overall Drift Score</h3>
+                <i data-lucide="gauge" class="status-icon"></i>
+            </div>
+            <div class="drift-score" id="overallScore">
+                <div class="score-value">0.25</div>
+                <div class="score-status good">Good</div>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-header">
+                <h3>Features Drifted</h3>
+                <i data-lucide="trending-down" class="status-icon"></i>
+            </div>
+            <div class="drift-count">
+                <div class="count-value" id="driftedFeatures">2</div>
+                <div class="count-total">out of 15</div>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-header">
+                <h3>Last Check</h3>
+                <i data-lucide="clock" class="status-icon"></i>
+            </div>
+            <div class="last-check">
+                <div class="check-time" id="lastCheck">2 hours ago</div>
+                <div class="next-check">Next: in 1 hour</div>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-header">
+                <h3>Model Impact</h3>
+                <i data-lucide="zap" class="status-icon"></i>
+            </div>
+            <div class="impact-level">
+                <div class="impact-value low">Low</div>
+                <div class="impact-desc">Minimal effect</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drift Report -->
+    <div class="drift-report-section">
+        <div class="section-header">
+            <h3>Detailed Drift Report</h3>
+            <div class="report-controls">
+                <button class="refresh-btn" onclick="refreshDriftReport()">
+                    <i data-lucide="refresh-cw"></i>
+                    Refresh
+                </button>
+                <button class="download-btn" onclick="downloadReport()">
+                    <i data-lucide="download"></i>
+                    Download
+                </button>
+            </div>
+        </div>
+        
+        <div class="drift-report-container">
+            <div class="loading-spinner" id="reportLoading">
+                <i data-lucide="loader"></i>
+                <span>Loading drift report...</span>
+            </div>
+            <iframe id="driftReport" class="drift-iframe" style="display: none;"></iframe>
+        </div>
+    </div>
+
+    <!-- Feature Drift Analysis -->
+    <div class="feature-drift-section">
+        <div class="section-header">
+            <h3>Feature Drift Analysis</h3>
+        </div>
+        <div class="feature-drift-table">
+            <table class="drift-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Drift Score</th>
+                        <th>Status</th>
+                        <th>Last Change</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="featureDriftTable">
+                    <tr>
+                        <td>price_lag_1</td>
+                        <td><span class="score-badge low">0.15</span></td>
+                        <td><span class="status-badge good">Good</span></td>
+                        <td>2 hours ago</td>
+                        <td><button class="action-btn">View Details</button></td>
+                    </tr>
+                    <tr>
+                        <td>volume_24h</td>
+                        <td><span class="score-badge medium">0.35</span></td>
+                        <td><span class="status-badge warning">Warning</span></td>
+                        <td>1 hour ago</td>
+                        <td><button class="action-btn">View Details</button></td>
+                    </tr>
+                    <tr>
+                        <td>market_cap</td>
+                        <td><span class="score-badge low">0.12</span></td>
+                        <td><span class="status-badge good">Good</span></td>
+                        <td>3 hours ago</td>
+                        <td><button class="action-btn">View Details</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="recommendations-section">
+        <div class="section-header">
+            <h3>Recommendations</h3>
+        </div>
+        <div class="recommendations-list">
+            <div class="recommendation-item medium">
+                <div class="rec-icon">
+                    <i data-lucide="alert-circle"></i>
+                </div>
+                <div class="rec-content">
+                    <div class="rec-title">Monitor Volume Feature</div>
+                    <div class="rec-desc">24h volume feature shows moderate drift. Consider investigating market conditions.</div>
+                </div>
+                <div class="rec-action">
+                    <button class="action-btn">Investigate</button>
+                </div>
+            </div>
+            
+            <div class="recommendation-item low">
+                <div class="rec-icon">
+                    <i data-lucide="info"></i>
+                </div>
+                <div class="rec-content">
+                    <div class="rec-title">Schedule Model Retraining</div>
+                    <div class="rec-desc">Consider retraining the model in the next 48 hours to maintain performance.</div>
+                </div>
+                <div class="rec-action">
+                    <button class="action-btn">Schedule</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/data_drift.js') }}"></script>
+{% endblock %}

@@ -39,7 +39,7 @@ project-root/
 │   │   │   ├── model_service.py     # Loads model and makes predictions
 │   │   │   ├── notify_service.py    # Sends alerts/notifications
 │   │   │   ├── data_service.py      # Fetches latest crypto data
-│   │   │   └── exceptions.py        # Custom error handling
+│   │   │   └── data_drift.py        # Custom error handling
 │   │   └── main.py                  # Entrypoint for web app
 │
 │   ├── config/                      # Configuration files
@@ -119,10 +119,12 @@ pipeline_config.yaml is there for the pipeline line it human readable and userfo
 8. Set Up PostgreSQL 
 sudo -i -u postgres
 psql
-create user crypto_user with passsword '1234';
-create database crypto_db;
-create database airflow_db;
-grant all privileges on database crypto_db, airflow_db to crypto_user;
+-- Create user
+CREATE USER api_user WITH PASSWORD '1234';
+
+-- (Optional) Create a database and grant privileges
+CREATE DATABASE api_db OWNER api_user;
+GRANT ALL PRIVILEGES ON DATABASE api_db TO api_user;
 
 9. but as real world project we no need to create any db in local system we have to crate docker images for every data storage 
 how we can find the data in db first we have to execuite the image of the db 

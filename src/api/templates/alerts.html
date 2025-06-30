@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Alerts - Crypto Prediction{% endblock %}
+
+{% block content %}
+<div class="alerts-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i data-lucide="bell" class="title-icon"></i>
+            Alert Management
+        </h1>
+        <button class="create-alert-btn" onclick="openAlertConfig()">
+            <i data-lucide="plus"></i>
+            Create Alert
+        </button>
+    </div>
+
+    <!-- Alert Stats -->
+    <div class="alert-stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3>Active Alerts</h3>
+                <i data-lucide="bell-ring" class="stat-icon"></i>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-change">+1 from yesterday</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3>Triggered Today</h3>
+                <i data-lucide="zap" class="stat-icon"></i>
+            </div>
+            <div class="stat-value">7</div>
+            <div class="stat-change">2 high priority</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3>Email Notifications</h3>
+                <i data-lucide="mail" class="stat-icon"></i>
+            </div>
+            <div class="stat-value">5</div>
+            <div class="stat-change">Sent successfully</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h3>Response Time</h3>
+                <i data-lucide="clock" class="stat-icon"></i>
+            </div>
+            <div class="stat-value">2.3s</div>
+            <div class="stat-change">Average</div>
+        </div>
+    </div>
+
+    <!-- Recent Alerts -->
+    <div class="recent-alerts-section">
+        <div class="section-header">
+            <h3>Recent Alerts</h3>
+            <div class="alert-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="high">High</button>
+                <button class="filter-btn" data-filter="medium">Medium</button>
+                <button class="filter-btn" data-filter="low">Low</button>
+            </div>
+        </div>
+
+        <div class="alerts-list" id="alertsList">
+            <div class="alert-item high">
+                <div class="alert-icon">
+                    <i data-lucide="alert-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Model Accuracy Drop - Bitcoin</div>
+                    <div class="alert-desc">Accuracy dropped to 78%, below threshold of 80%</div>
+                    <div class="alert-time">15 minutes ago</div>
+                </div>
+                <div class="alert-actions">
+                    <button class="action-btn acknowledge">Acknowledge</button>
+                    <button class="action-btn resolve">Resolve</button>
+                </div>
+            </div>
+
+            <div class="alert-item medium">
+                <div class="alert-icon">
+                    <i data-lucide="trending-down"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Data Drift Detected - Ethereum</div>
+                    <div class="alert-desc">Volume feature shows significant drift (score: 0.45)</div>
+                    <div class="alert-time">1 hour ago</div>
+                </div>
+                <div class="alert-actions">
+                    <button class="action-btn acknowledge">Acknowledge</button>
+                    <button class="action-btn resolve">Resolve</button>
+                </div>
+            </div>
+
+            <div class="alert-item low acknowledged">
+                <div class="alert-icon">
+                    <i data-lucide="info"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">Scheduled Retraining - Bitcoin</div>
+                    <div class="alert-desc">Model retraining completed successfully</div>
+                    <div class="alert-time">3 hours ago</div>
+                </div>
+                <div class="alert-status">
+                    <span class="status-badge">Acknowledged</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Configuration -->
+    <div class="alert-config-section">
+        <div class="section-header">
+            <h3>Alert Configuration</h3>
+        </div>
+        
+        <div class="config-cards">
+            <div class="config-card">
+                <div class="config-header">
+                    <h4>Performance Thresholds</h4>
+                    <i data-lucide="sliders" class="config-icon"></i>
+                </div>
+                <div class="config-content">
+                    <div class="threshold-item">
+                        <label>Accuracy Drop (%)</label>
+                        <input type="number" class="threshold-input" value="5" min="1" max="50">
+                    </div>
+                    <div class="threshold-item">
+                        <label>MSE Increase (%)</label>
+                        <input type="number" class="threshold-input" value="20" min="5" max="100">
+                    </div>
+                    <div class="threshold-item">
+                        <label>Prediction Error (%)</label>
+                        <input type="number" class="threshold-input" value="15" min="5" max="50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-card">
+                <div class="config-header">
+                    <h4>Email Notifications</h4>
+                    <i data-lucide="mail" class="config-icon"></i>
+                </div>
+                <div class="config-content">
+                    <div class="email-toggle">
+                        <label class="toggle-label">
+                            <input type="checkbox" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            Enable Email Alerts
+                        </label>
+                    </div>
+                    <div class="email-input">
+                        <label>Email Address</label>
+                        <input type="email" class="email-field" placeholder="your-email@example.com">
+                    </div>
+                    <div class="email-test">
+                        <button class="test-btn">Send Test Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Configuration Modal -->
+<div class="modal" id="alertConfigModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create New Alert</h3>
+            <button class="modal-close" onclick="closeAlertConfig()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="alertForm">
+                <div class="form-group">
+                    <label>Alert Type</label>
+                    <select class="form-select">
+                        <option value="accuracy">Model Accuracy</option>
+                        <option value="drift">Data Drift</option>
+                        <option value="prediction">Prediction Error</option>
+                        <option value="system">System Error</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Coin</label>
+                    <select class="form-select">
+                        <option value="bitcoin">Bitcoin</option>
+                        <option value="ethereum">Ethereum</option>
+                        <option value="all">All Coins</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Threshold</label>
+                    <input type="number" class="form-input" placeholder="Enter threshold value">
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select class="form-select">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeAlertConfig()">Cancel</button>
+            <button class="btn-primary" onclick="saveAlert()">Create Alert</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+{% endblock %}

@@ -3,6 +3,7 @@ import os
 import re
 import joblib
 import pandas as pd
+import numpy as np
 import mlflow
 from utils.logger import get_logger
 from config.config import DB_CONFIG, DATA_PATHS
@@ -24,12 +25,21 @@ def split_data(coin: str):
         logger.error(f"failed to split the {str(e)}")
         raise
 
+def mean_absolute_percentage_error(y_true, y_pred):
+    """Custom MAPE implementation (sklearn doesn't have built-in MAPE)"""
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    non_zero = y_true != 0
+    return np.mean(np.abs((y_true[non_zero] - y_pred[non_zero]) / y_true[non_zero])) * 100
+
 def evaluate_model(coin: str) -> dict:
     """Evaluate model with multiple metrics"""
+    def extract_weight_number(path_obj):
+        match = re.search(rf"{coin}_weight_(\d+)\.pkl", path_obj.name)
+        return int(match.group(1)) if match else float('inf')
     
     _, X_test, _, y_test = split_data(coin)
     model_dir = DATA_PATHS['model_weight']
-    model_files = sorted(model_dir.glob(f"{coin}_weight_*.pkl"))
+    model_files = sorted(model_dir.glob(f"{coin}_weight_*.pkl"), key=extract_weight_number)
     metrics_path = os.path.join(DATA_PATHS['model_metrics'],f"{coin}_metrics.csv")
 
     if not model_files:
@@ -45,13 +55,15 @@ def evaluate_model(coin: str) -> dict:
             predictions = model.predict(X_test)
         
             mse = mean_squared_error(y_test, predictions)
-            r2 = r2_score(y_test, predictions)
+            r2 = r2_score(y_test, predictions) * 100
             mae = mean_absolute_error(y_test, predictions)
+            mape = mean_absolute_percentage_error(y_test, predictions)
             metrics = {
                     'name': model_file.name,
                     'coin': coin,
                     'mse': mse,
-                    'r2': r2,
+                    'mape': mape,
+                    'accuracy': r2,
                     'mae': mae,
                     'timestamp': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S.%f')
                 }
