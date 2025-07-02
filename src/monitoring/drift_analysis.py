@@ -32,7 +32,8 @@ def get_drift(
                 "volatility_10",
             ]
         )
-        # Report help initialize the report and datadriftpresent help to check each feature drift
+        # Report help initialize the report and datadriftpresent help 
+        # to check each feature drift
         report = Report(metrics=[DataDriftPreset()])
         report.run(
             reference_data=reference_data,
@@ -40,7 +41,8 @@ def get_drift(
             column_mapping=column_mapping,
         )
 
-        # It is used to make it as dictionary and drift_detected check weather dict structure is as need or not
+        # It is used to make it as dictionary and drift_detected check weather 
+        # dict structure is as need or not
         result_dict = report.as_dict()
         drift_detected = result_dict["metrics"][0]["result"]["dataset_drift"]
 
@@ -50,7 +52,8 @@ def get_drift(
         output_path = os.path.join(output_dir, f"{coin}_drift_report.html")
         logger.info(f"Data drift for {coin}: {drift_detected}")
         report.save_html(output_path)
-        return {"coin": coin, "drift_detected": drift_detected, "details": result_dict}
+        return {"coin": coin, "drift_detected": drift_detected,
+                 "details": result_dict}
 
     except Exception as e:
         logger.error(f"Error analyzing drift for {coin}: {str(e)}")

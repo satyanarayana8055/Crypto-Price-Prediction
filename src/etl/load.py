@@ -27,8 +27,10 @@ def load_to_database(transformed_file: str):
             )
         """
         create_table(create_query)
+
         insert_query = f"""INSERT INTO {table_name} 
-                    (coin, timestamp, price, market_cap, volume, price_change_24h, price_change_percentage_24h)
+                    (coin, timestamp, price, market_cap, 
+                    volume, price_change_24h, price_change_percentage_24h)
                     VALUES (%s, %s, %s, %s, %s, %s, %s);
                     """
         load_to_db(df, insert_query, table_name)

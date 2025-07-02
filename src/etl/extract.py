@@ -36,7 +36,8 @@ def extract_coin_data(
 
             if not prices:
                 logger.warning(
-                    f"No data for {coin} from {start_date.date()} to {end_date.date()}"
+                    f"""No data for {coin} from {start_date.date()} 
+                    to {end_date.date()}"""
                 )
                 return None
 
@@ -94,7 +95,8 @@ def extract_coin_data(
             if os.path.exists(output_file):
                 old_df = pd.read_csv(output_file, parse_dates=["timestamp"])
                 df = pd.concat([old_df, df])
-                df = df.drop_duplicates(subset=["timestamp", "coin"], keep="first")
+                df = df.drop_duplicates(subset=["timestamp", "coin"],
+                                         keep="first")
 
             df.sort_values("timestamp", inplace=True)
             df.reset_index(drop=True, inplace=True)
@@ -115,11 +117,13 @@ def extract_coin_data(
             # Save CSV and verify
             df.to_csv(output_file, index=False)
             if os.path.exists(output_file):
-                logger.info(f"Successfully saved data for {coin} to {output_file}")
+                logger.info
+                (f"Successfully saved data for {coin} to {output_file}")
                 return output_file
             else:
                 logger.error(
-                    f"Failed to save data for {coin} to {output_file}: File does not exist"
+                    f"""Failed to save data for {coin}
+                      to {output_file}: File does not exist"""
                 )
                 raise OSError(f"CSV file {output_file} was not created")
 
@@ -128,5 +132,6 @@ def extract_coin_data(
             logger.warning(f"Attempt {attempt} failed for {coin}: {str(e)}")
             time.sleep(2)
             if attempt == retries:
-                logger.error(f"Failed to extract {coin} data after {retries} attempts")
+                logger.error
+                (f"Failed to extract {coin} data after {retries} attempts")
                 raise

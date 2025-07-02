@@ -35,7 +35,8 @@ class NotifyService:
         return {
             "email": {
                 "enabled": bool(
-                    Web.EMAIL_USER and Web.EMAIL_PASSWORD and Web.NOTIFICATION_EMAIL
+                    Web.EMAIL_USER and Web.EMAIL_PASSWORD and
+                      Web.NOTIFICATION_EMAIL
                 ),
                 "smtp_server": Web.SMTP_SERVER,
                 "smtp_port": int(Web.SMTP_PORT),

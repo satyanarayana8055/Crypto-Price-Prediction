@@ -41,7 +41,8 @@ def best_metrics(df: pd.DataFrame, coin: str) -> pd.DataFrame:
 
     # If file exists, append without header; otherwise, write with header
     if os.path.exists(metrics_file):
-        best_metrics_df.to_csv(metrics_file, mode="a", index=False, header=False)
+        best_metrics_df.to_csv(metrics_file, mode="a", 
+                               index=False, header=False)
     else:
         best_metrics_df.to_csv(metrics_file, index=False, header=True)
 
@@ -51,7 +52,8 @@ def mean_absolute_percentage_error(y_true, y_pred):
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     non_zero = y_true != 0
     return (
-        np.mean(np.abs((y_true[non_zero] - y_pred[non_zero]) / y_true[non_zero])) * 100
+        np.mean(np.abs((y_true[non_zero] -
+                         y_pred[non_zero]) / y_true[non_zero])) * 100
     )
 
 
@@ -67,7 +69,8 @@ def evaluate_model(coin: str) -> dict:
     model_files = sorted(
         model_dir.glob(f"{coin}_weight_*.pkl"), key=extract_weight_number
     )
-    metrics_path = os.path.join(DATA_PATHS["model_metrics"], f"{coin}_metrics.csv")
+    metrics_path = os.path.join(DATA_PATHS["model_metrics"],
+                                 f"{coin}_metrics.csv")
 
     if not model_files:
         logger.warning(f"No versioned models found for {coin} in {model_dir}")

@@ -13,7 +13,9 @@ notify_service = NotifyService()
 
 
 def monitor_metrics(coin: str) -> dict:
-    """Monitor metrics for a given coin and trigger alerts if thresholds are breached"""
+    """Monitor metrics for a given coin and
+    trigger alerts if thresholds are breached
+    """
     try:
         metrics_file = os.path.join(
             DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"

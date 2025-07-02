@@ -42,7 +42,8 @@ class DataService:
             if coin in data:
                 coin_data = data[coin]
 
-                self.cache[cache_key] = {"data": coin_data, "timestamp": time.time()}
+                self.cache[cache_key] = {"data": coin_data, 
+                                         "timestamp": time.time()}
                 return {
                     "coin": coin,
                     "price": coin_data["usd"],

@@ -30,7 +30,8 @@ def ensure_directory(path: str | Path):
 
 
 def validate_dataframe(df: pd.DataFrame, expected_columns: list):
-    """Validate DataFrame structure it ensure the data is correct extracted base on our requirements"""
+    """Validate DataFrame structure it ensure the data
+      is correct extracted base on our requirements"""
     if df.empty:
         raise ValueError("DataFrame is empty")
     missing_columns = [col for col in expected_columns if col not in df.columns]
@@ -46,13 +47,17 @@ def get_db_connection(config: dict):
     conn = None
     try:
         conn = psycopg2.connect(**config)
-        yield conn  # It is used to used to return object temporarily to caller and pause untill caller is done
+        yield conn  
+        # It is used to used to return object temporarily 
+        # to caller and pause untill caller is done
     finally:
         if conn:
             conn.close()
 
 
-# Trucated table is more faster than deleting the table because it remove complete data srcipt one time from data table without removing the table structure
+# Trucated table is more faster than deleting the table 
+# because it remove complete data srcipt one time from data table 
+# without removing the table structure
 def truncate_table(table_name: str):
     """Deletes all data from a table"""
     try:
@@ -73,7 +78,8 @@ def truncate_table(table_name: str):
 
 
 def create_table(create_query):
-    """Creates the table if not exists and ensures the unique constraint is applied"""
+    """Creates the table if not exists and 
+    ensures the unique constraint is applied"""
     try:
         hook = PostgresHook(postgres_conn_id="my_postgres_conn_id")
         conn = hook.get_conn()
@@ -111,7 +117,8 @@ def is_new_data(coin: str, table_name: str) -> Optional[datetime]:
         )
 
 
-# This code is used to insert data into airflow postgres db it not good practice to use to_sql in airflow database so we are using creating table and inserting
+# This code is used to insert data into airflow postgres db it not good practice
+# to use to_sql in airflow database so we are using creating table and inserting
 def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
     """Load a DataFrame into PostgreSQL table"""
     try:
@@ -119,7 +126,8 @@ def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
         conn = hook.get_conn()
         cursor = conn.cursor()
         data = list(
-            df.drop(columns=["id"], errors="ignore").itertuples(index=False, name=None)
+            df.drop(columns=["id"], errors="ignore").itertuples
+            (index=False, name=None)
         )
         cursor.executemany(insert_query, data)
         conn.commit()
@@ -164,7 +172,7 @@ def load_api_db(df: pd.DataFrame, insert_query: str, table_name: str):
 
             cursor = conn.cursor()
 
-            # Convert DataFrame to list of tuples, excluding 'id' column if present
+        # Convert DataFrame to list of tuples, excluding 'id' column if present
             data = list(
                 df.drop(columns=["id"], errors="ignore").itertuples(
                     index=False, name=None

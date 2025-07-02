@@ -1,4 +1,5 @@
 """Setup scripts for the Crypto Price Prediction package"""
+
 import setuptools  # It is used to make the need folders as modules and we can it in PyPI website too
 from pathlib import Path
 
@@ -13,25 +14,21 @@ AUTHOR_USER_NAME = "satyanarayana8055"
 SRC_REPO = "src"  # It creates inside the src folder egg data
 AUTHOR_EMAIL = "muddalasatyanarayana96@gmail.com"
 
-# Read requirements 
-with open ("requirements.txt", "r", encoding="utf-8") as f:
+# Read requirements
+with open("requirements.txt", "r", encoding="utf-8") as f:
     install_requires = f.read().splitlines()
 
-# Packages data to include non-python files 
+# Packages data to include non-python files
 # This code tell to PyPI to include non python files
 package_data = {
-    "cryptoPredictor":[
+    "cryptoPredictor": [
         "config/*.py",
         "app/templates/*.html",
         "app/static/css/*.css",
-        "app/static/js/*.js", 
+        "app/static/js/*.js",
     ],
-    ".": [
-        "config/*.yaml",
-        "dags/*.py",
-        "docker/*" 
-        ]
-    }
+    ".": ["config/*.yaml", "dags/*.py", "docker/*"],
+}
 
 # Setup configuration
 setuptools.setup(
@@ -41,15 +38,15 @@ setuptools.setup(
     author_email=AUTHOR_EMAIL,
     description="A Python package for real-time cryptocurrency price prediction using CoinGecko data",
     long_description=long_description,
-    long_description_content_type="text/markdown", # It helps your code to write in markdown language
+    long_description_content_type="text/markdown",  # It helps your code to write in markdown language
     url=f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}",
     project_urls={
         "Bug Tracker": f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}/issues",
-        "Documentation": f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}/blob/main/README.md"
+        "Documentation": f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}/blob/main/README.md",
     },
     license="MIT",
-    package_dir={"":"src"},
-    packages=setuptools.find_packages(where="src", include=['*','app.*']),
+    package_dir={"": "src"},
+    packages=setuptools.find_packages(where="src", include=["*", "app.*"]),
     package_data=package_data,
     include_package_data=True,
     install_requires=install_requires,
@@ -81,8 +78,6 @@ setuptools.setup(
         "data-science",
         "coingecko",
         "etl",
-        "airflow"
-    ]
-
-
+        "airflow",
+    ],
 )

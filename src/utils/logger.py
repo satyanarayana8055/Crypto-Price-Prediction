@@ -9,8 +9,10 @@ from config.config import LOG_CONFIG
 
 def get_logger(name: str) -> logging.Logger:
     """Create a logger with rotation
-    Tell the function name is str only and it should return the logging.logger only
-    It is for code readability and maintainability"""
+    Tell the function name is str only and it should
+    return the logging.logger only
+    It is for code readability and maintainability
+    """
     logger = logging.getLogger(name)
     if not logger.handlers:
         logger.setLevel(getattr(logging, LOG_CONFIG["level"]))

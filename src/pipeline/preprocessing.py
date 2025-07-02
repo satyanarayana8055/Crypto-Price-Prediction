@@ -17,7 +17,8 @@ logger = get_logger("model")
 
 
 def clean_data(df: pd.DataFrame):
-    """Preprocess data by scaling and handling outliers, loading from and saving to database"""
+    """Preprocess data by scaling and handling outliers,
+      loading from and saving to database"""
 
     # checking the missing and treating them
     try:

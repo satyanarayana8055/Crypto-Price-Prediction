@@ -126,8 +126,7 @@ def extract_features(coin: str):
         return None
 
     cleaned_df = feature_engineering(df)
-    # features_path = os.path.join(DATA_PATHS['processed'],f"extract_features_{coin}.csv")
-    # cleaned_df.to_csv(features_path, index=False)
+
 
     insert_query = f"""
         INSERT INTO {table_name} (date, price, coin, version,
@@ -137,7 +136,9 @@ def extract_features(coin: str):
                     price_diff, pct_change_1, pct_change_7,
                     day_of_week, day_of_month, month, is_weekend,
                     exp_moving_avg_10, volatility_10, target)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s, %s)
     """
     # Load conditionally
     if last_date:
@@ -146,4 +147,4 @@ def extract_features(coin: str):
     else:
         truncate_table(table_name)
         load_to_db(cleaned_df, insert_query, table_name)
-        logger.info(f"Replaced {table_name} with initial cleaned data for {coin} ")
+        logger.info(f"Replaced {table_name} with initial cleaned data for {coin}")
