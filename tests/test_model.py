@@ -5,9 +5,9 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
-from config.config import DATA_PATHS, COINS, DB_CONFIG
-from utils.helper import get_db_connection
-from pipeline.model import prepare_data
+from src.config.config import DATA_PATHS, COINS, DB_CONFIG
+from src.utils.helper import get_db_connection
+from src.pipeline.model import prepare_data
 
 
 @pytest.mark.parametrize("coin", COINS)

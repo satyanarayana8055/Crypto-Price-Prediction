@@ -4,10 +4,10 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import yaml
-from etl.extract import extract_coin_data
-from etl.transform import transform_coin_data
-from etl.load import load_to_database
-from utils.logger import get_logger
+from src.etl.extract import extract_coin_data
+from src.etl.transform import transform_coin_data
+from src.etl.load import load_to_database
+from src.utils.logger import get_logger
 
 logger = get_logger("dags")
 
