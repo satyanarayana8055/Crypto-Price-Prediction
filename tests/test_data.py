@@ -3,8 +3,8 @@
 import os
 import pytest
 import pandas as pd
-from src.utils.helper import validate_dataframe
-from src.config.config import DATA_PATHS, COINS
+from utils.helper import validate_dataframe
+from config.config import DATA_PATHS, COINS
 
 expected_columns = [
     "coin",

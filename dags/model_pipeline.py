@@ -4,11 +4,11 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import yaml
-from src.pipeline.preprocessing import preprocess_data
-from src.pipeline.feature_extraction import extract_features
-from src.pipeline.model import train_model
-from src.pipeline.evaluate import evaluate_model
-from src.utils.logger import get_logger
+from pipeline.preprocessing import preprocess_data
+from pipeline.feature_extraction import extract_features
+from pipeline.model import train_model
+from pipeline.evaluate import evaluate_model
+from utils.logger import get_logger
 
 logger = get_logger("dags")
 

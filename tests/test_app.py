@@ -1,8 +1,8 @@
 """Test for Flask application"""
 
 import pytest
-from src.api.app import create_app
-from src.config.config import COINS
+from api.app import create_app
+from config.config import COINS
 
 
 @pytest.fixture(scope="module")
