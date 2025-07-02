@@ -3,9 +3,7 @@
 import logging
 import os 
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 from utils.helper import ensure_directory
-from dotenv import load_dotenv
 from config.config import LOG_CONFIG
 
 def get_logger(name: str) -> logging.Logger:

@@ -58,7 +58,7 @@ LOG_CONFIG = {
 DATA_PATHS = {
     'raw': BASE_DIR / 'data' / 'raw',
     'transfrom': BASE_DIR / 'data' / 'transfrom',
-    'processed': BASE_DIR / 'data' / 'processed',
+    'notify': BASE_DIR / 'data' / 'notify_json',
     'model_weight': BASE_DIR / 'data' / 'model' / 'weight',
     'model_metrics': BASE_DIR / 'data' / 'model' / 'metrics',
     'drift_html': BASE_DIR / 'data' / 'monitor' / 'drift',

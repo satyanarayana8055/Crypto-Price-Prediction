@@ -3,9 +3,6 @@ import mlflow.sklearn
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import os
-import sys
-import ast
-from pathlib import Path
 import joblib 
 import mlflow
 import mlflow.sklearn
@@ -13,8 +10,7 @@ import pandas as pd
 from itertools import product
 from utils.logger import get_logger
 from config.config import DB_CONFIG, DATA_PATHS
-from utils.helper import get_db_connection, ensure_directory
-from mlflow.exceptions import MlflowException
+from utils.helper import get_db_connection
 
 logger = get_logger('model')
 
@@ -46,7 +42,6 @@ def prepare_data(df: pd.DataFrame):
 
 def train_model(coin:str, hyperparams: dict = None):
     """Train a Random Forest model with grid search"""
-    table_name = f'model_weights_{coin}'
     raw_table = f'extract_features_{coin}'
 
     try:

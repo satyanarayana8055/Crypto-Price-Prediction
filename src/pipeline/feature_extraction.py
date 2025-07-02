@@ -1,9 +1,7 @@
 """Extraction data for ML model"""
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 from utils.logger import get_logger
-from config.config import   DB_CONFIG, DATA_PATHS
-import os
+from config.config import   DB_CONFIG
 from utils.helper import get_db_connection, load_to_db, truncate_table, create_table, is_new_data
 
 logger = get_logger('model')

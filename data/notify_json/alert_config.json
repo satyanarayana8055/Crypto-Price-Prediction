@@ -1,0 +1,18 @@
+{
+  "email": {
+    "enabled": false,
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "username": "",
+    "password": "",
+    "to_email": ""
+  },
+  "thresholds": {
+    "accuracy_drop": 0.1,
+    "mse_increase": 0.2
+  },
+  "coins": [
+    "bitcoin"
+  ],
+  "check_interval": 3600
+}

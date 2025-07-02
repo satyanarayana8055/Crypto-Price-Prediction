@@ -1,6 +1,6 @@
 """Main entry point for CryptoPredictor Flask app"""
 from flask import Flask, request
-from config.config import config, Web
+from config.config import config
 from utils.logger import get_logger
 from api.routes import main_bp
 import os

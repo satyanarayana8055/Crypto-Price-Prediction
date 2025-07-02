@@ -6,7 +6,7 @@ import time
 from utils.helper import get_db_connection
 
 
-logger = get_logger('app')
+logger = get_logger('service')
 
 class DataService:
     """Service for fetching cryptocurrency data using CoinGecko API"""

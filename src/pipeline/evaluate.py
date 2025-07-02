@@ -25,6 +25,23 @@ def split_data(coin: str):
         logger.error(f"failed to split the {str(e)}")
         raise
 
+def best_metrics(df: pd.DataFrame, coin: str) -> pd.DataFrame:
+
+    # Get the row with the best R² score
+    best_metrics = df.loc[df['accuracy'].idxmax()]
+    best_metrics_df=best_metrics.to_frame().T
+
+    # Path for performance metrics file
+    metrics_file = os.path.join(DATA_PATHS['perform_metrics'],f"{coin}_performance_metrics.csv")
+
+    # If file exists, append without header; otherwise, write with header
+    if os.path.exists(metrics_file):
+        best_metrics_df.to_csv(metrics_file, mode='a', index=False, header=False)
+    else:
+        best_metrics_df.to_csv(metrics_file, index=False, header=True)
+    
+
+
 def mean_absolute_percentage_error(y_true, y_pred):
     """Custom MAPE implementation (sklearn doesn't have built-in MAPE)"""
     y_true, y_pred = np.array(y_true), np.array(y_pred)
@@ -78,3 +95,5 @@ def evaluate_model(coin: str) -> dict:
     df_metrics = pd.DataFrame(results)
     df_metrics.to_csv(metrics_path, index=False)
     logger.info(f"Evaluation metrics saved to {metrics_path}")
+    best_metrics(df_metrics, coin)
+    logger.info("In that metrics best metrics also save to csv")

@@ -1,12 +1,10 @@
 """Reusable utility functions for CryptoPredictor"""
-import os
 import pandas as pd
 import psycopg2
-import re
 from pathlib import Path
 from contextlib import contextmanager # Decorator to write custom context managers using generator functions instead of classes
-from config.config import DATA_PATHS, DB_CONFIG, DB_API_CONFIG
-from datetime import datetime, timedelta
+from config.config import DB_CONFIG, DB_API_CONFIG
+from datetime import datetime
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.exceptions import AirflowFailException
 from typing import Optional

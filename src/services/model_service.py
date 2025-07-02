@@ -11,16 +11,17 @@ from utils.logger import get_logger
 from config.config import DATA_PATHS, DB_CONFIG
 from utils.helper import get_db_connection
 from services.data_service import DataService
-logger = get_logger('model_service')
+logger = get_logger('service')
 
 class ModelService:
     def __init__(self):
         self.model_path = DATA_PATHS['model_weight']
         self.feature_path = DATA_PATHS['processed']
-        self.models = {}
         self.metrics_path = DATA_PATHS['model_metrics']
+        self.models = {}
         self.best_model = {}
-    def load_models(self,coin):
+
+    def load_models(self, coin: str):
         """Load XGBoost models for each coin"""
         try:
             # Load best model name from performance metrics
@@ -34,6 +35,7 @@ class ModelService:
                 raise FileNotFoundError(f"Model for {coin} not found")
             self.models[coin] = joblib.load(model_path)
             return self.models[coin]
+        
         except Exception as e:
             logger.error(f"Error loading models: {e}")
             return None
@@ -41,18 +43,12 @@ class ModelService:
     def load_features(self, coin: str):
         """Load features for model prediction"""
         try:
-            # Load the feature CSV
-            features_file = os.path.join(self.feature_path,f"extract_features_{coin}.csv")
-            if os.path.exists(features_file):
-                return pd.read_csv(features_file)
-            else:
-                raise FileNotFoundError(f"Feature CSV not found for {coin} at {features_file}")
-            
             # Fetch feature data from database
-            # with get_db_connection(DB_CONFIG) as conn:
-            #     features_table = f"extract_features_{coin}" 
-            #     query = f"SELECT * FROM {features_table}"
-            #     df = pd.read_sql(query, conn)
+            with get_db_connection(DB_CONFIG) as conn:
+                features_table = f"extract_features_{coin}" 
+                query = f"SELECT * FROM {features_table}"
+                df = pd.read_sql(query, conn)
+                return df
             
         except Exception as e:
             logger.error(f"Error preparing features: {e}")
@@ -83,8 +79,6 @@ class ModelService:
 
             # Calculate prediction confidence (simplified)
             confidence = min(95, max(60, 80 + np.random.normal(0, 10)))
-
-
             
             return {
                 'coin': coin,

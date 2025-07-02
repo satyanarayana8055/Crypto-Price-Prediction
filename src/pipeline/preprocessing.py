@@ -1,14 +1,10 @@
 """Preprocesses data for ML model"""
-import os
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 from utils.logger import get_logger
 from config.config import   DB_CONFIG
-from datetime import datetime, timedelta
 from utils.helper import get_db_connection, load_to_db, truncate_table, create_table, is_new_data
 from scipy.stats.mstats import winsorize
-from airflow.exceptions import AirflowFailException
 
 logger = get_logger('model')
 

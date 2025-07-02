@@ -1,35 +1,54 @@
 """Tracks model performance metrics"""
 import pandas as pd
 import os
-import sys
-import mlflow
-import requests
+from datetime import datetime
 from utils.logger import get_logger
+from utils.helper import validate_dataframe, ensure_directory
 from config.config import DATA_PATHS
+from services.notify_service import NotifyService
 
 logger = get_logger('monitor')
+notify_service = NotifyService()
+
+def monitor_metrics(coin: str) ->  dict:
+    """Monitor metrics for a given coin and trigger alerts if thresholds are breached"""
+    try:
+        metrics_file = os.path.join(DATA_PATHS['perform_metrics'],f'{coin}_performance_metrics.csv')
+        
+        ensure_directory(DATA_PATHS['perform_metrics'])
+        df = pd.read_csv(metrics_file)
+        if df.empty:
+            logger.error(f"Loaded data is empty from path {metrics_file}")
+
+        # Get the latest metrics
+        current_metrics = df.iloc[-1].to_dict()
+        current_metrics['coin'] = coin
+        current_metrics['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Load previous metrics if available
+        previous_metrics = df.iloc[-2].to_dict() if len(df) > 1 else {}
+
+        alerts = notify_service.check_thresholds(coin, current_metrics, previous_metrics)
+        logger.info(f"{len(alerts)} alerts triggered for {coin}")
+
+        for alert in alerts:
+            notify_service.send_email_alerts(
+                subject=alert['type'].replace('_', ' ').title(),
+                message=alert['message'],
+                coin=coin
+            )
+        logger.info("Send alert successfully")
+
+        return {"status": "success", "alerts": alerts}
+    except Exception as e:
+        logger.error(f"Error monitoring metrics for {coin}: {str(e)}")
+        return {"status": "error", "message": str(e)}
+ 
 
 
-def monitor_metrics(coin: str):
+   
 
-    path = os.path.join(DATA_PATHS['model_metrics'],f"{coin}_metrics.csv")
-    df = pd.read_csv(path)
     
-    # Get the row with the best R² score
-    best_metrics = df.loc[df['accuracy'].idxmax()]
-    best_metrics_df=best_metrics.to_frame().T
-
-    # Path for performance metrics file
-    output_path = os.path.join(DATA_PATHS['perform_metrics'],f"{coin}_performance_metrics.csv")
-
-    # If file exists, append without header; otherwise, write with header
-    if os.path.exists(output_path):
-        best_metrics_df.to_csv(output_path, mode='a', index=False, header=False)
-    else:
-        best_metrics_df.to_csv(output_path, index=False, header=True)
-
-
-# def monitor_metrics(coin: str):
 
 
     # # Compare with thresholds
