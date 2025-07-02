@@ -4,7 +4,6 @@ import re
 import joblib
 import pandas as pd
 import numpy as np
-import mlflow
 from utils.logger import get_logger
 from config.config import DB_CONFIG, DATA_PATHS
 from pipeline.model import prepare_data
@@ -59,8 +58,8 @@ def mean_absolute_percentage_error(y_true, y_pred):
             np.abs(
                 (y_true[non_zero] -
                  y_pred[non_zero]) /
-                y_true[non_zero])) *
-        100)
+                y_true[non_zero])) * 100
+        )
 
 
 def evaluate_model(coin: str) -> dict:
@@ -106,7 +105,8 @@ def evaluate_model(coin: str) -> dict:
             }
             results.append(metrics)
             logger.info(
-                f"Evaluated {model_file.name} — R2: {r2:.4f}, MSE: {mse:.4f}, MAE: {mae:.4f}"
+                f"Evaluated {model_file.name} — "
+                f"R2: {r2:.4f}, MSE: {mse:.4f}, MAE: {mae:.4f}"
             )
 
         except Exception as e:

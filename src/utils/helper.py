@@ -136,7 +136,7 @@ def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
         cursor.executemany(insert_query, data)
         conn.commit()
         print(f"Inserted {cursor.rowcount} rows into {table_name}")
-    except Exception as e:
+    except Exception :
         if conn:
             conn.rollback()
         raise AirflowFailException(f"Failed to insert into {table_name}")
@@ -146,58 +146,3 @@ def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
         if conn:
             conn.close()
 
-
-def create_api_table(create_query: str):
-    """Create a table in PostgreSQL."""
-
-    try:
-        with get_db_connection(DB_API_CONFIG) as conn:
-            cursor = conn.cursor()
-            cursor.execute(create_query)
-            conn.commit()
-            print(f"Table created or verified successfully")
-    except PsycopgError as e:
-        print(f"Failed to create table: {str(e)}")
-        raise Exception(f"Failed to create table: {str(e)}")
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-            print("Database connection closed")
-
-
-def load_api_db(df: pd.DataFrame, insert_query: str, table_name: str):
-    """Load a DataFrame into a PostgreSQL table without Airflow dependency."""
-    conn = None
-    cursor = None
-    try:
-        with get_db_connection(DB_API_CONFIG) as conn:
-
-            cursor = conn.cursor()
-
-            # Convert DataFrame to list of tuples, excluding 'id' column if
-            # present
-            data = list(
-                df.drop(columns=["id"], errors="ignore").itertuples(
-                    index=False, name=None
-                )
-            )
-
-            # Execute the insert query
-            cursor.executemany(insert_query, data)
-            conn.commit()
-            print(f"Inserted {cursor.rowcount} rows into {table_name}")
-
-    except PsycopgError as e:
-        if conn:
-            conn.rollback()
-        print(f"Failed to insert into {table_name}: {str(e)}")
-        raise Exception(f"Failed to insert into {table_name}: {str(e)}")
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-            print(f"Database connection closed for {table_name}")

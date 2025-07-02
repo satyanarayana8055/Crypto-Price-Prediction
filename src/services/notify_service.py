@@ -25,7 +25,7 @@ class NotifyService:
             else:
                 self.config = self.get_default_config()
                 self.save_config()
-            logger.info(f"Load json successfully")
+            logger.info("Load json successfully")
         except Exception as e:
             logger.error(f"Error loading config: {e}")
             self.config = self.get_default_config()
@@ -64,9 +64,9 @@ class NotifyService:
             os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
             with open(self.config_file, "w") as f:
                 json.dump(self.config, f, indent=2)
-            logger.info(f"Saved loggers sucessfully")
+            logger.info("Saved loggers sucessfully")
         except Exception as e:
-            logger.error(f"Error saving config: {e}")
+            logger.error(f"Error saving config: {str(e)}")
 
     def configure_alerts(self, new_config):
         """Update alert configuration"""
@@ -98,7 +98,11 @@ class NotifyService:
                     alerts.append(
                         {
                             "type": "accuracy_drop",
-                            "message": f"Model accuracy dropped to {current_metrics['accuracy']:.2%} (Drop: {accuracy_drop:.2%})",
+                            "message": (
+                                f"Model accuracy dropped to 
+                                {current_metrics['accuracy']:.2%} "
+                                f"(Drop: {accuracy_drop:.2%})"
+                            ),                            
                             "severity": "high",
                             "timestamp": current_metrics["timestamp"],
                             "coin": coin,

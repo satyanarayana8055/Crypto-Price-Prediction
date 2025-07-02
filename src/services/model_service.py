@@ -4,14 +4,11 @@ import joblib
 import pandas as pd
 import numpy as np
 import os
-import sys
-from typing import Dict, List
-from datetime import datetime, timedelta
-from config.config import Web
+from typing import Dict
+from datetime import datetime
 from utils.logger import get_logger
 from config.config import DATA_PATHS, DB_CONFIG
 from utils.helper import get_db_connection
-from services.data_service import DataService
 
 logger = get_logger("service")
 
