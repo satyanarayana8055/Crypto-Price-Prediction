@@ -6,12 +6,11 @@ from pathlib import Path
 # Decorator to write custom context managers using generator functions
 # instead of classes
 from contextlib import (contextmanager, )
-from config.config import DB_CONFIG, DB_API_CONFIG
+from config.config import DB_CONFIG
 from datetime import datetime
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.exceptions import AirflowFailException
 from typing import Optional
-from psycopg2 import Error as PsycopgError
 
 
 def ensure_directory(path: str | Path):
@@ -24,7 +23,7 @@ def ensure_directory(path: str | Path):
             dir_path.mkdir(parents=True, exist_ok=True)
         else:
             print(f"Directory already exists: {dir_path}")
-    except Exception as e:
+    except Exception :
         print(f"Error creating directory {dir_path}")
         raise
 

@@ -99,8 +99,7 @@ class NotifyService:
                         {
                             "type": "accuracy_drop",
                             "message": (
-                                f"Model accuracy dropped to 
-                                {current_metrics['accuracy']:.2%} "
+                                f"Model accuracy dropped to {current_metrics['accuracy']:.2%} "
                                 f"(Drop: {accuracy_drop:.2%})"
                             ),                            
                             "severity": "high",

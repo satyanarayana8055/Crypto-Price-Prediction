@@ -53,13 +53,10 @@ def mean_absolute_percentage_error(y_true, y_pred):
     """Custom MAPE implementation (sklearn doesn't have built-in MAPE)"""
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     non_zero = y_true != 0
-    return (
-        np.mean(
-            np.abs(
-                (y_true[non_zero] -
-                 y_pred[non_zero]) /
-                y_true[non_zero])) * 100
-        )
+    mape = np.mean(
+            np.abs((y_true[non_zero] - y_pred[non_zero]) / y_true[non_zero])
+        ) * 100
+    return mape
 
 
 def evaluate_model(coin: str) -> dict:
@@ -105,8 +102,10 @@ def evaluate_model(coin: str) -> dict:
             }
             results.append(metrics)
             logger.info(
-                f"Evaluated {model_file.name} — "
-                f"R2: {r2:.4f}, MSE: {mse:.4f}, MAE: {mae:.4f}"
+                (
+                    f"Evaluated {model_file.name} — "
+                    f"R2: {r2:.4f}, MSE: {mse:.4f}, MAE: {mae:.4f}"
+                )
             )
 
         except Exception as e:
