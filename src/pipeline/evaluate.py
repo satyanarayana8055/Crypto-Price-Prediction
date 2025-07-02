@@ -73,7 +73,8 @@ def evaluate_model(coin: str) -> dict:
     )
     metrics_path = os.path.join(
         DATA_PATHS["model_metrics"],
-        f"{coin}_metrics.csv")
+        f"{coin}_metrics.csv"
+    )
 
     if not model_files:
         logger.warning(f"No versioned models found for {coin} in {model_dir}")
@@ -105,7 +106,7 @@ def evaluate_model(coin: str) -> dict:
                 (
                     f"Evaluated {model_file.name} — "
                     f"R2: {r2:.4f}, MSE: {mse:.4f}, MAE: {mae:.4f}"
-                )
+                ),
             )
 
         except Exception as e:
