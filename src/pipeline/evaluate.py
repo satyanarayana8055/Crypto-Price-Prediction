@@ -55,7 +55,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
     non_zero = y_true != 0
     mape = np.mean(
             np.abs((y_true[non_zero] - y_pred[non_zero]) / y_true[non_zero])
-        ) * 100
+    ) * 100
     return mape
 
 

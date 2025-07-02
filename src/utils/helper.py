@@ -144,4 +144,3 @@ def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
             cursor.close()
         if conn:
             conn.close()
-
