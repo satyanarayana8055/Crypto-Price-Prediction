@@ -7,7 +7,7 @@ import os
 logger = get_logger('app')
 
 
-def create_app(config_name='default') -> Flask:
+def create_app(config_name='testing') -> Flask:
     """Create and configure Flask application"""
     cfg = config[config_name]
     app = Flask(__name__, template_folder='templates', static_folder='static')
