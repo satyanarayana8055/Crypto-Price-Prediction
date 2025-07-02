@@ -1,16 +1,18 @@
 """Loading CSV to database"""
+
 import pandas as pd
 from utils.helper import create_table, load_to_db
 from utils.logger import get_logger
 
-logger = get_logger('etl')
-    
+logger = get_logger("etl")
+
+
 def load_to_database(transformed_file: str):
     """Load transformed data into DB"""
     try:
         df = pd.read_csv(transformed_file)
-        coin = df['coin'].iloc[0]
-        table_name = f'prices_{coin}'
+        coin = df["coin"].iloc[0]
+        table_name = f"prices_{coin}"
         create_query = f"""
             CREATE TABLE IF NOT EXISTS {table_name} (
                 id SERIAL PRIMARY KEY,

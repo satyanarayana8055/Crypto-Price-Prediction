@@ -5,31 +5,27 @@ airflow:
       - bitcoin
       - ethereum
       - cardano
-      - solana    
-  
+      - solana
+
   model_dag:
     schedule: "0 0 1 * *" # 1st of every month
     coins:
       - bitcoin
       - ethereum
       - cardano
-      - solana    
-  
-    hyperparams: 
+      - solana
+
+    hyperparams:
       n_estimators: [50, 150]
       max_depth: [5, 10]
       min_samples_split: [5, 10]
       min_samples_leaf: [2, 4]
-      max_features: ['log2', 0.5]
-  
-    
+      max_features: ["log2", 0.5]
+
   monitor_dag:
     schedule: "0 0 * * 0" # weekly at sunday night
     coins:
       - bitcoin
       - ethereum
       - cardano
-      - solana    
-  
-
-
+      - solana
