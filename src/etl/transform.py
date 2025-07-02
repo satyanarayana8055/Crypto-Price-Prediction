@@ -45,8 +45,9 @@ def transform_coin_data(raw_file: str) -> str:
         # Ensure chronogical order
         df = df.sort_values("timestamp")
 
-        output_file = os.path.join(DATA_PATHS["transfrom"],
-                                   f"{coin}_transformed.csv")
+        output_file = os.path.join(
+            DATA_PATHS["transfrom"], f"{coin}_transformed.csv"
+        )
         ensure_directory(DATA_PATHS["transfrom"])
         df.to_csv(output_file, index=False)
         logger.info(f"Transformed {coin} data to {output_file}")

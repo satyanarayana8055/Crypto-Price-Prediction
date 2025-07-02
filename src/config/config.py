@@ -70,16 +70,22 @@ DATA_PATHS = {
     "perform_metrics": BASE_DIR / "data" / "monitor" / "performance",
 }
 
-THRESHOLDS = {"mae": os.getenv("MAE"),
-               "mse": os.getenv("MSE"),
-                 "r2": os.getenv("R2")}
+THRESHOLDS = {
+    "mae": os.getenv("MAE"),
+    "mse": os.getenv("MSE"),
+    "r2": os.getenv("R2")
+}
 
 
 class Web:
     "WEB base configuration class"
 
     # Flask settings
-    SECRET_KEY = os.getenv("FLASK_SECRET_KEY") or "crypto-predict-secret-key-2025"
+    SECRET_KEY = (
+        os.getenv("FLASK_SECRET_KEY") 
+        or "crypto-predict-secret-key-2025"
+    )
+    
     DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
     HOST = os.getenv("FLASK_HOST", "0.0.0.0")
     PORT = int(os.getenv("FLASK_PORT", 5000))
