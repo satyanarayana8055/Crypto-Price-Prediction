@@ -130,8 +130,8 @@ def extract_features(coin: str):
 
     insert_query = f"""
         INSERT INTO {table_name} (date, price, coin, version,
-                    lag_1, lag_2, lag_3, lag_7, lag_14, 
-                    rolling_mean_3, rolling_std_3, rolling_mean_7, 
+                    lag_1, lag_2, lag_3, lag_7, lag_14,
+                    rolling_mean_3, rolling_std_3, rolling_mean_7,
                     rolling_std_7, rolling_max_7, rolling_min_7,
                     price_diff, pct_change_1, pct_change_7,
                     day_of_week, day_of_month, month, is_weekend,

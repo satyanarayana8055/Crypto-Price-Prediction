@@ -42,7 +42,7 @@ class DataService:
             if coin in data:
                 coin_data = data[coin]
 
-                self.cache[cache_key] = {"data": coin_data, 
+                self.cache[cache_key] = {"data": coin_data,
                                          "timestamp": time.time()}
                 return {
                     "coin": coin,
@@ -144,7 +144,7 @@ class DataService:
                     f"""
                     SELECT timestamp, price FROM {table_name}
                             WHERE coin = %s AND timestamp >= %s
-                            ORDER BY timestamp ASC 
+                            ORDER BY timestamp ASC
                             """,
                     (coin, start_date),
                 )

@@ -41,7 +41,7 @@ def best_metrics(df: pd.DataFrame, coin: str) -> pd.DataFrame:
 
     # If file exists, append without header; otherwise, write with header
     if os.path.exists(metrics_file):
-        best_metrics_df.to_csv(metrics_file, mode="a", 
+        best_metrics_df.to_csv(metrics_file, mode="a",
                                index=False, header=False)
     else:
         best_metrics_df.to_csv(metrics_file, index=False, header=True)

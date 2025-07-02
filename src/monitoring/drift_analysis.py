@@ -32,7 +32,7 @@ def get_drift(
                 "volatility_10",
             ]
         )
-        # Report help initialize the report and datadriftpresent help 
+        # Report help initialize the report and datadriftpresent help
         # to check each feature drift
         report = Report(metrics=[DataDriftPreset()])
         report.run(
@@ -41,7 +41,7 @@ def get_drift(
             column_mapping=column_mapping,
         )
 
-        # It is used to make it as dictionary and drift_detected check weather 
+        # It is used to make it as dictionary and drift_detected check weather
         # dict structure is as need or not
         result_dict = report.as_dict()
         drift_detected = result_dict["metrics"][0]["result"]["dataset_drift"]

@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 import yaml
 from monitoring.drift_analysis import analyze_drift
 from monitoring.performance_metrics import monitor_metrics
-from utils.logger import get_logger 
+from utils.logger import get_logger
 
 logger = get_logger('monitor_pipeline')
 
-with open('/app/dags/dag_config.yml', 'r') as f: 
+with open('/app/dags/dag_config.yml', 'r') as f:
     config = yaml.safe_load(f)
 default_args = {
     'owner': 'airflow',

@@ -35,7 +35,7 @@ class ModelService:
             self.best_model[coin] = best_df["name"].iloc[-1]
 
             # Load the model file
-            model_path = os.path.join(DATA_PATHS["model_weight"], 
+            model_path = os.path.join(DATA_PATHS["model_weight"],
                                       self.best_model[coin])
             if not os.path.exists(model_path):
                 raise FileNotFoundError(f"Model for {coin} not found")
@@ -98,7 +98,7 @@ class ModelService:
 
             # Get current price for comparision
             current_price = (
-                features_df.iloc[-1]["price"] if "price" in 
+                features_df.iloc[-1]["price"] if "price" in
                 features_df.columns else 0
             )
 

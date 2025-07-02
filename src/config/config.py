@@ -1,6 +1,6 @@
 """
-The config.py file acts as a central controller for the project, 
-storing all directory paths, file locations, and configurable parameters. 
+The config.py file acts as a central controller for the project,
+storing all directory paths, file locations, and configurable parameters.
 It enables easier parameter tuning and promotes modular, maintainable code
 """
 
@@ -27,7 +27,7 @@ def validate_env_vars():
 validate_env_vars()
 
 # Package constants
-# For code flexibilty we can add any coin name 
+# For code flexibilty we can add any coin name
 # without changing src code and it create the table for it
 PACKAGE_NAME = "cryptoPredictor"
 COINS = os.getenv("COINGECKO_COINS", "bitcoin").split(",")
@@ -68,7 +68,7 @@ DATA_PATHS = {
     "model_metrics": BASE_DIR / "data" / "model" / "metrics",
     "drift_html": BASE_DIR / "data" / "monitor" / "drift",
     "perform_metrics": BASE_DIR / "data" / "monitor" / "performance",
-}                                                       
+}
 
 THRESHOLDS = {"mae": os.getenv("MAE"),
                "mse": os.getenv("MSE"),

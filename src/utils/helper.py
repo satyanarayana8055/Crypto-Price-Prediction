@@ -47,16 +47,16 @@ def get_db_connection(config: dict):
     conn = None
     try:
         conn = psycopg2.connect(**config)
-        yield conn  
-        # It is used to used to return object temporarily 
+        yield conn
+        # It is used to used to return object temporarily
         # to caller and pause untill caller is done
     finally:
         if conn:
             conn.close()
 
 
-# Trucated table is more faster than deleting the table 
-# because it remove complete data srcipt one time from data table 
+# Trucated table is more faster than deleting the table
+# because it remove complete data srcipt one time from data table
 # without removing the table structure
 def truncate_table(table_name: str):
     """Deletes all data from a table"""
@@ -78,7 +78,7 @@ def truncate_table(table_name: str):
 
 
 def create_table(create_query):
-    """Creates the table if not exists and 
+    """Creates the table if not exists and
     ensures the unique constraint is applied"""
     try:
         hook = PostgresHook(postgres_conn_id="my_postgres_conn_id")

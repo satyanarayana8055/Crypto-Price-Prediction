@@ -36,7 +36,7 @@ def extract_coin_data(
 
             if not prices:
                 logger.warning(
-                    f"""No data for {coin} from {start_date.date()} 
+                    f"""No data for {coin} from {start_date.date()}
                     to {end_date.date()}"""
                 )
                 return None

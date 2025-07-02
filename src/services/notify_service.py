@@ -139,7 +139,7 @@ class NotifyService:
             body = f"""\
             Alert for {coin.upper()}
             Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            
+
             {message}
 
             Please check your dashboard for more details.

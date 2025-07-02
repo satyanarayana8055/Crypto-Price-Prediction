@@ -45,7 +45,7 @@ def transform_coin_data(raw_file: str) -> str:
         # Ensure chronogical order
         df = df.sort_values("timestamp")
 
-        output_file = os.path.join(DATA_PATHS["transfrom"], 
+        output_file = os.path.join(DATA_PATHS["transfrom"],
                                    f"{coin}_transformed.csv")
         ensure_directory(DATA_PATHS["transfrom"])
         df.to_csv(output_file, index=False)
@@ -67,10 +67,10 @@ Usage from the terminal:
     python script.py <file1.csv> [<file2.csv> <file3.csv> ...]
 
 How it works:
-    - The script reads all file paths passed as command-line 
+    - The script reads all file paths passed as command-line
     arguments (via sys.argv[1:])
     - If one file is provided, it calls `transform_coin_data()` directly.
-    - If multiple files are provided, it uses `transform_all_coins()` 
+    - If multiple files are provided, it uses `transform_all_coins()`
     to process them in a loop.
 
 Example:
