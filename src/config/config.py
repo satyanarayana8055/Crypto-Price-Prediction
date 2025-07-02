@@ -70,7 +70,9 @@ DATA_PATHS = {
     "perform_metrics": BASE_DIR / "data" / "monitor" / "performance",
 }                                                       
 
-THRESHOLDS = {"mae": os.getenv("MAE"), "mse": os.getenv("MSE"), "r2": os.getenv("R2")}
+THRESHOLDS = {"mae": os.getenv("MAE"),
+               "mse": os.getenv("MSE"),
+                 "r2": os.getenv("R2")}
 
 
 class Web:
