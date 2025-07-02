@@ -14,13 +14,14 @@ logger = get_logger("etl")
 
 
 def extract_coin_data(
-    coin: str, start_date: datetime,
-    end_date: datetime, 
-    retries: int = 3
+    coin: str, start_date: datetime, end_date: datetime, retries: int = 3
 ) -> str:
     """Extract daily data using CoinGecko API and save as CSV"""
 
-    from_ts = int(datetime.combine(start_date, datetime.min.time()).timestamp())
+    from_ts = int(
+        datetime.combine(
+            start_date,
+            datetime.min.time()).timestamp())
     to_ts = int(datetime.combine(end_date, datetime.min.time()).timestamp())
     attempt = 0
     base_url = Web.COINGECKO_API_URL
@@ -98,7 +99,9 @@ def extract_coin_data(
                 old_df = pd.read_csv(output_file, parse_dates=["timestamp"])
                 df = pd.concat([old_df, df])
                 df = df.drop_duplicates(
-                    subset=["timestamp", "coin"],
+                    subset=[
+                        "timestamp",
+                        "coin"],
                     keep="first")
 
             df.sort_values("timestamp", inplace=True)

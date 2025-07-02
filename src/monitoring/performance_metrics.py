@@ -29,7 +29,8 @@ def monitor_metrics(coin: str) -> dict:
         # Get the latest metrics
         current_metrics = df.iloc[-1].to_dict()
         current_metrics["coin"] = coin
-        current_metrics["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_metrics["timestamp"] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S")
 
         # Load previous metrics if available
         previous_metrics = df.iloc[-2].to_dict() if len(df) > 1 else {}

@@ -52,8 +52,10 @@ def get_drift(
         output_path = os.path.join(output_dir, f"{coin}_drift_report.html")
         logger.info(f"Data drift for {coin}: {drift_detected}")
         report.save_html(output_path)
-        return {"coin": coin, "drift_detected": drift_detected,
-                 "details": result_dict}
+        return {
+            "coin": coin,
+            "drift_detected": drift_detected,
+            "details": result_dict}
 
     except Exception as e:
         logger.error(f"Error analyzing drift for {coin}: {str(e)}")

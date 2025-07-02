@@ -35,7 +35,8 @@ dag = DAG(
 
 def create_coin_tasks(coin: str):
     """Create ETL tasks for a coin"""
-    # For initial run, extract 1-year data; for daily runs, extract only the latest day
+    # For initial run, extract 1-year data; for daily runs, extract only the
+    # latest day
     is_initial_run = "{{dag_run.conf.get('initial_run', False)}}"
     end_date = datetime.today()
     start_date = end_date - timedelta(days=364 if is_initial_run else 1)
@@ -62,5 +63,6 @@ def create_coin_tasks(coin: str):
     return load_task
 
 
-coin_tasks = [create_coin_tasks(coin) for coin in config["airflow"]["etl_dag"]["coins"]]
+coin_tasks = [create_coin_tasks(coin)
+              for coin in config["airflow"]["etl_dag"]["coins"]]
 logger.info("ETL pipeline DAG initialized")

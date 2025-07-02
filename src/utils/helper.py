@@ -3,9 +3,9 @@
 import pandas as pd
 import psycopg2
 from pathlib import Path
-from contextlib import (
-    contextmanager,
-)  # Decorator to write custom context managers using generator functions instead of classes
+# Decorator to write custom context managers using generator functions
+# instead of classes
+from contextlib import (contextmanager, )
 from config.config import DB_CONFIG, DB_API_CONFIG
 from datetime import datetime
 from airflow.providers.postgres.hooks.postgres import PostgresHook
@@ -31,10 +31,11 @@ def ensure_directory(path: str | Path):
 
 def validate_dataframe(df: pd.DataFrame, expected_columns: list):
     """Validate DataFrame structure it ensure the data
-      is correct extracted base on our requirements"""
+    is correct extracted base on our requirements"""
     if df.empty:
         raise ValueError("DataFrame is empty")
-    missing_columns = [col for col in expected_columns if col not in df.columns]
+    missing_columns = [
+        col for col in expected_columns if col not in df.columns]
     if missing_columns:
         raise ValueError(f"Missing columns: {missing_columns}")
 
@@ -118,7 +119,8 @@ def is_new_data(coin: str, table_name: str) -> Optional[datetime]:
 
 
 # This code is used to insert data into airflow postgres db it not good practice
-# to use to_sql in airflow database so we are using creating table and inserting
+# to use to_sql in airflow database so we are using creating table and
+# inserting
 def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
     """Load a DataFrame into PostgreSQL table"""
     try:
@@ -126,9 +128,11 @@ def load_to_db(df: pd.DataFrame, insert_query: str, table_name: str):
         conn = hook.get_conn()
         cursor = conn.cursor()
         data = list(
-            df.drop(columns=["id"], errors="ignore").itertuples
-            (index=False, name=None)
-        )
+            df.drop(
+                columns=["id"],
+                errors="ignore").itertuples(
+                index=False,
+                name=None))
         cursor.executemany(insert_query, data)
         conn.commit()
         print(f"Inserted {cursor.rowcount} rows into {table_name}")
@@ -172,7 +176,8 @@ def load_api_db(df: pd.DataFrame, insert_query: str, table_name: str):
 
             cursor = conn.cursor()
 
-        # Convert DataFrame to list of tuples, excluding 'id' column if present
+            # Convert DataFrame to list of tuples, excluding 'id' column if
+            # present
             data = list(
                 df.drop(columns=["id"], errors="ignore").itertuples(
                     index=False, name=None

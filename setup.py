@@ -1,6 +1,8 @@
 """Setup scripts for the Crypto Price Prediction package"""
 
-import setuptools  # It is used to make the need folders as modules and we can it in PyPI website too
+# It is used to make the need folders as modules and we can it in PyPI
+# website too
+import setuptools
 from pathlib import Path
 
 # Read README.md for long description when use this repo in PyPI
@@ -38,7 +40,8 @@ setuptools.setup(
     author_email=AUTHOR_EMAIL,
     description="A Python package for real-time cryptocurrency price prediction using CoinGecko data",
     long_description=long_description,
-    long_description_content_type="text/markdown",  # It helps your code to write in markdown language
+    # It helps your code to write in markdown language
+    long_description_content_type="text/markdown",
     url=f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}",
     project_urls={
         "Bug Tracker": f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}/issues",

@@ -12,7 +12,8 @@ logger = get_logger("service")
 
 class NotifyService:
     def __init__(self):
-        self.config_file = os.path.join(DATA_PATHS["notify"], "alert_config.json")
+        self.config_file = os.path.join(
+            DATA_PATHS["notify"], "alert_config.json")
         self.load_config()
 
     def load_config(self):
@@ -35,18 +36,23 @@ class NotifyService:
         return {
             "email": {
                 "enabled": bool(
-                    Web.EMAIL_USER and Web.EMAIL_PASSWORD and
-                      Web.NOTIFICATION_EMAIL
-                ),
+                    Web.EMAIL_USER and Web.EMAIL_PASSWORD and Web.NOTIFICATION_EMAIL),
                 "smtp_server": Web.SMTP_SERVER,
-                "smtp_port": int(Web.SMTP_PORT),
+                "smtp_port": int(
+                    Web.SMTP_PORT),
                 "username": Web.EMAIL_USER,
                 "password": Web.EMAIL_PASSWORD,
                 "to_email": Web.NOTIFICATION_EMAIL,
             },
             "thresholds": {
-                "accuracy_drop": float(THRESHOLDS.get("r2", 0.05)),
-                "mse_increase": float(THRESHOLDS.get("mse", 0.20)),
+                "accuracy_drop": float(
+                    THRESHOLDS.get(
+                        "r2",
+                        0.05)),
+                "mse_increase": float(
+                    THRESHOLDS.get(
+                        "mse",
+                        0.20)),
             },
             "coins": COINS,
             "check_interval": 3600,
@@ -72,7 +78,11 @@ class NotifyService:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
-    def check_thresholds(self, coin, current_metrics: dict, previous_metrics: dict):
+    def check_thresholds(
+            self,
+            coin,
+            current_metrics: dict,
+            previous_metrics: dict):
         """Check if any thresholds are breached"""
         alerts = []
         thresholds = self.config["thresholds"]
@@ -93,8 +103,7 @@ class NotifyService:
                             "timestamp": current_metrics["timestamp"],
                             "coin": coin,
                             "status": "activate",
-                        }
-                    )
+                        })
         # Check MSE increase
         if "mse" in current_metrics and previous_metrics and "mse" in previous_metrics:
             mse_increase = (
@@ -127,7 +136,9 @@ class NotifyService:
                 ]
             ):
                 logger.warning("Email configuration incomplete")
-                return {"status": "error", "message": "Email configuration incomplete"}
+                return {
+                    "status": "error",
+                    "message": "Email configuration incomplete"}
 
             # Create message
             msg = MIMEMultipart()
@@ -148,17 +159,18 @@ class NotifyService:
 
             # Send email
             server = smtplib.SMTP(
-                self.config["email"]["smtp_server"], self.config["email"]["smtp_port"]
-            )
+                self.config["email"]["smtp_server"],
+                self.config["email"]["smtp_port"])
 
             server.starttls()
             server.login(
-                self.config["email"]["username"], self.config["email"]["password"]
-            )
+                self.config["email"]["username"],
+                self.config["email"]["password"])
             text = msg.as_string()
             server.sendmail(
-                self.config["email"]["username"], self.config["email"]["to_email"], text
-            )
+                self.config["email"]["username"],
+                self.config["email"]["to_email"],
+                text)
 
             server.quit()
             logger.info(f"Email alert send for {coin}: {subject}")

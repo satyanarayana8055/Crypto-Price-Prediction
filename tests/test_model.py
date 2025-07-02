@@ -26,7 +26,8 @@ def test_model_prediction(coin):
     perf_path = os.path.join(
         DATA_PATHS["performance_metrics"], f"{coin}_performance_metrics.csv"
     )
-    assert os.path.exists(perf_path), f"Performance metrics not found: {perf_path}"
+    assert os.path.exists(
+        perf_path), f"Performance metrics not found: {perf_path}"
 
     best_model_df = pd.read_csv(perf_path)
     assert not best_model_df.empty, f"No performance data for: {coin}"

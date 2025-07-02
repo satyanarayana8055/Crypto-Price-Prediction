@@ -18,7 +18,7 @@ logger = get_logger("model")
 
 def clean_data(df: pd.DataFrame):
     """Preprocess data by scaling and handling outliers,
-      loading from and saving to database"""
+    loading from and saving to database"""
 
     # checking the missing and treating them
     try:
@@ -36,8 +36,15 @@ def clean_data(df: pd.DataFrame):
 
         # Dealing with the outlier with IQR method
         for col in df.columns:
-            if pd.api.types.is_numeric_dtype(df[col]) and col not in ["id", "version"]:
-                df[col] = pd.Series(np.asarray(winsorize(df[col], limits=[0.05, 0.05])))
+            if pd.api.types.is_numeric_dtype(df[col]) and col not in [
+                    "id", "version"]:
+                df[col] = pd.Series(
+                    np.asarray(
+                        winsorize(
+                            df[col],
+                            limits=[
+                                0.05,
+                                0.05])))
 
         logger.info("Capping the outlier successfully")
 
@@ -109,4 +116,5 @@ def preprocess_data(coin: str):
     else:
         truncate_table(table_name)
         load_to_db(cleaned_df, insert_query, table_name)
-        logger.info(f"Replaced {table_name} with initial cleaned data for {coin} ")
+        logger.info(
+            f"Replaced {table_name} with initial cleaned data for {coin} ")

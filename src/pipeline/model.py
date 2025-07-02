@@ -97,7 +97,8 @@ def train_model(coin: str, hyperparams: dict = None):
         )
     )
 
-    for i, (n_est, depth, split, leaf, feat) in enumerate(combinations, start=1):
+    for i, (n_est, depth, split, leaf, feat) in enumerate(
+            combinations, start=1):
         # Train the model
         try:
             with mlflow.start_run(run_name=f"{coin}_training_run_{i}"):
@@ -118,14 +119,22 @@ def train_model(coin: str, hyperparams: dict = None):
                 model.fit(X_train, y_train)
 
                 y_pred = model.predict(X_train)
-                mlflow.log_metric("train_mse", mean_squared_error(y_train, y_pred))
+                mlflow.log_metric(
+                    "train_mse", mean_squared_error(
+                        y_train, y_pred))
                 mlflow.log_metric("train_r2", r2_score(y_train, y_pred))
-                mlflow.log_metric("train_mae", mean_absolute_error(y_train, y_pred))
+                mlflow.log_metric(
+                    "train_mae", mean_absolute_error(
+                        y_train, y_pred))
 
                 yt_pred = model.predict(X_test)
-                mlflow.log_metric("test_mse", mean_squared_error(y_test, yt_pred))
+                mlflow.log_metric(
+                    "test_mse", mean_squared_error(
+                        y_test, yt_pred))
                 mlflow.log_metric("test_r2", r2_score(y_test, yt_pred))
-                mlflow.log_metric("test_mae", mean_absolute_error(y_test, yt_pred))
+                mlflow.log_metric(
+                    "test_mae", mean_absolute_error(
+                        y_test, yt_pred))
 
                 # save the model locally
                 model_path = os.path.join(
@@ -137,4 +146,5 @@ def train_model(coin: str, hyperparams: dict = None):
                 # Log to MLflow
                 mlflow.sklearn.log_model(model, artifact_path="model")
         except Exception as e:
-            logger.error(f"Model train with mlflow is failed due to {i}: {str(e)}")
+            logger.error(
+                f"Model train with mlflow is failed due to {i}: {str(e)}")

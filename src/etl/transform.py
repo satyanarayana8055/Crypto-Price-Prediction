@@ -33,7 +33,8 @@ def transform_coin_data(raw_file: str) -> str:
         df = df[df["price"] > 0]
         df = df[df["volume"] >= 0]
 
-        # Add minimal transformations if needed (e.g., rounging for consistency)
+        # Add minimal transformations if needed (e.g., rounging for
+        # consistency)
         df["price"] = df["price"].astype(float).round(2)
         df["volume"] = df["volume"].astype(float).round(2)
         df["market_cap"] = df["market_cap"].astype(float).round(2)
@@ -46,8 +47,8 @@ def transform_coin_data(raw_file: str) -> str:
         df = df.sort_values("timestamp")
 
         output_file = os.path.join(
-            DATA_PATHS["transfrom"], f"{coin}_transformed.csv"
-        )
+            DATA_PATHS["transfrom"],
+            f"{coin}_transformed.csv")
         ensure_directory(DATA_PATHS["transfrom"])
         df.to_csv(output_file, index=False)
         logger.info(f"Transformed {coin} data to {output_file}")

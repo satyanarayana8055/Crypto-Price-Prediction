@@ -29,14 +29,15 @@ class ModelService:
         try:
             # Load best model name from performance metrics
             best_model_path = os.path.join(
-                DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"
-            )
+                DATA_PATHS["perform_metrics"],
+                f"{coin}_performance_metrics.csv")
             best_df = pd.read_csv(best_model_path)
             self.best_model[coin] = best_df["name"].iloc[-1]
 
             # Load the model file
-            model_path = os.path.join(DATA_PATHS["model_weight"],
-                                      self.best_model[coin])
+            model_path = os.path.join(
+                DATA_PATHS["model_weight"],
+                self.best_model[coin])
             if not os.path.exists(model_path):
                 raise FileNotFoundError(f"Model for {coin} not found")
             self.models[coin] = joblib.load(model_path)
@@ -98,8 +99,7 @@ class ModelService:
 
             # Get current price for comparision
             current_price = (
-                features_df.iloc[-1]["price"] if "price" in
-                features_df.columns else 0
+                features_df.iloc[-1]["price"] if "price" in features_df.columns else 0
             )
 
             # Calculate prediction confidence (simplified)
@@ -127,7 +127,8 @@ class ModelService:
     def get_metrics(self, coin: str = "bitcoin"):
         """Get model performance metrics"""
         try:
-            metrics_file = os.path.join(self.metrics_path,f"{coin}_metrics.csv")
+            metrics_file = os.path.join(
+                self.metrics_path, f"{coin}_metrics.csv")
             df = pd.read_csv(metrics_file)
 
             # Filter the row where name equals self.best_model

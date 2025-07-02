@@ -21,7 +21,8 @@ def feature_engineering(df: pd.DataFrame):
     try:
         if not isinstance(df, pd.DataFrame):
             logger.error(f"Expected pandas DataFrame, got {type(df)}")
-            raise TypeError(f"Input must be a pandas DataFrame, got {type(df)}")
+            raise TypeError(
+                f"Input must be a pandas DataFrame, got {type(df)}")
         for lag in [1, 2, 3, 7, 14]:
             df[f"lag_{lag}"] = df["price"].shift(lag)
 
@@ -127,7 +128,6 @@ def extract_features(coin: str):
 
     cleaned_df = feature_engineering(df)
 
-
     insert_query = f"""
         INSERT INTO {table_name} (date, price, coin, version,
                     lag_1, lag_2, lag_3, lag_7, lag_14,
@@ -147,4 +147,5 @@ def extract_features(coin: str):
     else:
         truncate_table(table_name)
         load_to_db(cleaned_df, insert_query, table_name)
-        logger.info(f"Replaced {table_name} with initial cleaned data for {coin}")
+        logger.info(
+            f"Replaced {table_name} with initial cleaned data for {coin}")
