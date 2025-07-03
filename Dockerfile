@@ -22,22 +22,31 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set environment variable
-ENV AIRFLOW_HOME=/app/airflow 
 ENV PYTHONPATH=/app:/app/src
 
 # Expose ports for Airflow webserver, Flask, and MLflow
-EXPOSE 5000 8080 5001
-
-# Download and install wait-for-it/ it help other container to wait untill another execute
-RUN curl -o /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
-    chmod +x /usr/local/bin/wait-for-it.sh
-
-
-# Copy entrypoint script
-COPY entrypoint.sh /app/entrypoint.sh 
-RUN chmod +x /app/entrypoint.sh
+EXPOSE 5000 
 
 # Default command
-CMD ["/app/entrypoint.sh"]
+CMD ["python", "src/api/app.py"]
 
 
+
+# # Set environment variable
+# ENV AIRFLOW_HOME=/app/airflow 
+# ENV PYTHONPATH=/app:/app/src
+
+# # Expose ports for Airflow webserver, Flask, and MLflow
+# EXPOSE 5000 8080 5001
+
+# # Download and install wait-for-it/ it help other container to wait untill another execute
+# RUN curl -o /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
+#     chmod +x /usr/local/bin/wait-for-it.sh
+
+
+# # Copy entrypoint script
+# COPY entrypoint.sh /app/entrypoint.sh 
+# RUN chmod +x /app/entrypoint.sh
+
+# # Default command
+# CMD ["/app/entrypoint.sh"]
