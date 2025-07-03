@@ -23,7 +23,7 @@ def test_model_prediction(coin):
 
     # Load best model info
     perf_path = os.path.join(
-        DATA_PATHS["performance_metrics"], f"{coin}_performance_metrics.csv"
+        DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"
     )
     assert os.path.exists(perf_path), f"Performance metrics not found: {perf_path}"
 
