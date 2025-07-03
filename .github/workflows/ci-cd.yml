@@ -60,4 +60,4 @@ jobs:
       - name: Install dependencies
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/crypto-predictor:latest .
-          docker push ${{ secrets.DOCKER_PASSWORD }}/crypto-predictor:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/crypto-predictor:latest
