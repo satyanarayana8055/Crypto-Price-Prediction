@@ -7,8 +7,7 @@ import os
 from typing import Dict
 from datetime import datetime
 from utils.logger import get_logger
-from config.config import DATA_PATHS, DB_CONFIG
-from utils.helper import get_db_connection
+from config.config import DATA_PATHS
 
 logger = get_logger("service")
 
@@ -25,15 +24,13 @@ class ModelService:
         try:
             # Load best model name from performance metrics
             best_model_path = os.path.join(
-                DATA_PATHS["perform_metrics"],
-                f"{coin}_performance_metrics.csv")
+                DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"
+            )
             best_df = pd.read_csv(best_model_path)
             self.best_model[coin] = best_df["name"].iloc[-1]
 
             # Load the model file
-            model_path = os.path.join(
-                DATA_PATHS["model_weight"],
-                self.best_model[coin])
+            model_path = os.path.join(DATA_PATHS["model_weight"], self.best_model[coin])
             if not os.path.exists(model_path):
                 raise FileNotFoundError(f"Model for {coin} not found")
             self.models[coin] = joblib.load(model_path)
@@ -47,12 +44,16 @@ class ModelService:
         """Load features for model prediction"""
         try:
             # Fetch feature data from database
-            with get_db_connection(DB_CONFIG) as conn:
-                features_table = f"extract_features_{coin}"
-                query = f"SELECT * FROM {features_table}"
-                df = pd.read_sql(query, conn)
-                return df
-
+            # with get_db_connection(DB_CONFIG) as conn:
+            #     features_table = f"extract_features_{coin}"
+            #     query = f"SELECT * FROM {features_table}"
+            #     df = pd.read_sql(query, conn)
+            #     return df
+            features_path = os.path.join(
+                DATA_PATHS["extracted"], f"extracted_features_{coin}.csv"
+            )
+            df = pd.read_csv(features_path)
+            return df
         except Exception as e:
             logger.error(f"Error preparing features: {e}")
             return None
@@ -123,8 +124,7 @@ class ModelService:
     def get_metrics(self, coin: str = "bitcoin"):
         """Get model performance metrics"""
         try:
-            metrics_file = os.path.join(
-                self.metrics_path, f"{coin}_metrics.csv")
+            metrics_file = os.path.join(self.metrics_path, f"{coin}_metrics.csv")
             df = pd.read_csv(metrics_file)
 
             # Filter the row where name equals self.best_model
