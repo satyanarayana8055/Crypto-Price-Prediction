@@ -197,7 +197,6 @@ logs/
 # Then grow often and grows to large it is good to ignore them
 
 # Data
-data/raw/*
 data/processed/*
 data/model/metrics
 data/model/weight
