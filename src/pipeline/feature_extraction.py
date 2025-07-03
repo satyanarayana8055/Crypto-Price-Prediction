@@ -102,8 +102,7 @@ def extract_features(coin: str):
         last_date = is_new_data(coin, table_name)
     except Exception as e:
         logger.warning(
-            f"Could not fetch latest date from {table_name}",
-             f"preceeding with full data reason for it {str(e)}"
+            f"Could not fetch latest date from {table_name}, preceeding with full data reason for it {str(e)}"
         )
         last_date = None
     try:
