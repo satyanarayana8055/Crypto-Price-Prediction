@@ -66,6 +66,7 @@ THRESHOLDS = {
     "r2": os.getenv("R2", "0.05"),
 }
 
+
 class Web:
     "WEB base configuration class"
 
