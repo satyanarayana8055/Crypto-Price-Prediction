@@ -15,7 +15,7 @@ def test_model_prediction(coin):
     """Test model prediction for each coin"""
     with get_db_connection(DB_CONFIG) as conn:
         query = f"SELECT * FROM extract_features_{coin}"
-        df = pd.read_csv(query, conn)
+        df = pd.read_sql(query, conn)
 
     assert not df.empty, f"Loaded data is empty for coin: {coin}"
 
