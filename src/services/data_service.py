@@ -1,10 +1,8 @@
 from utils.logger import get_logger
-from config.config import DB_CONFIG, DATA_PATHS, Web
-import requests
+from config.config import DATA_PATHS, Web
 from datetime import datetime, timedelta
 import time
 import os
-from utils.helper import get_db_connection
 import pandas as pd
 
 logger = get_logger("service")
