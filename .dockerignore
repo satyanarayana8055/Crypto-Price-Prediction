@@ -7,4 +7,4 @@ __pycache__
 logs/
 .github/
 airflow/
-data/
+data/notify_json/*

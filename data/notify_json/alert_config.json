@@ -1,18 +1,21 @@
 {
   "email": {
-    "enabled": false,
+    "enabled": true,
     "smtp_server": "smtp.gmail.com",
     "smtp_port": 587,
-    "username": "",
-    "password": "",
-    "to_email": ""
+    "username": "muddalasatyanarayana96@gmail.com",
+    "password": "mszy pkrp ucbs bfel",
+    "to_email": "muddalasatyanarayana150@gmail.com"
   },
   "thresholds": {
-    "accuracy_drop": 0.1,
-    "mse_increase": 0.2
+    "accuracy_drop": 0.85,
+    "mse_increase": 3000.0
   },
   "coins": [
-    "bitcoin"
+    "bitcoin",
+    "cardano",
+    "ethereum",
+    "solana"
   ],
   "check_interval": 3600
 }

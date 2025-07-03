@@ -197,7 +197,7 @@ logs/
 # Then grow often and grows to large it is good to ignore them
 
 # Data
-data/processed/*
+data/notify_json/*
 data/model/metrics
 data/model/weight
 !data/raw/.gitkeep 
