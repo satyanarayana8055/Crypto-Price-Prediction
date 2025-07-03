@@ -50,6 +50,7 @@ def test_get_prediction(test_client, coin):
     data = response.get_json()
     assert isinstance(data, dict)
 
+
 @pytest.mark.parametrize("coin", COINS)
 def test_get_model_metrics(test_client, coin):
     response = test_client.get(f"/api/model-metrics/{coin}")
