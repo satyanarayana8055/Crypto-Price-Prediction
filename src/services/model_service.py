@@ -16,7 +16,6 @@ logger = get_logger("service")
 class ModelService:
     def __init__(self):
         self.model_path = DATA_PATHS["model_weight"]
-        self.feature_path = DATA_PATHS["processed"]
         self.metrics_path = DATA_PATHS["model_metrics"]
         self.models = {}
         self.best_model = {}
