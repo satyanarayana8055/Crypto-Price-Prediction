@@ -13,7 +13,7 @@ from pipeline.model import prepare_data
 def test_model_prediction(coin):
     """Test model prediction for each coin"""
     features_path = os.path.join(
-        DATA_PATHS["extracted"], f"extract_features_{coin}.csv"
+        DATA_PATHS["extracted"], f"extracted_features_{coin}.csv"
     )
     df = pd.read_csv(features_path)
 
