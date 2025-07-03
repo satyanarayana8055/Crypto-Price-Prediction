@@ -5,8 +5,7 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
-from config.config import DATA_PATHS, COINS, DB_CONFIG
-from utils.helper import get_db_connection
+from config.config import DATA_PATHS, COINS
 from pipeline.model import prepare_data
 
 
