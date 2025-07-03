@@ -32,7 +32,7 @@ def test_model_prediction(coin):
     assert not best_model_df.empty, f"No performance data for: {coin}"
 
     best_model_name = best_model_df["name"].iloc[-1]
-    model_path = os.path.join(DATA_PATHS["model_weight"], best_model_name)
+    model_path = os.path.join(DATA_PATHS["best_model"], best_model_name)
     assert os.path.exists(model_path), f"Model file not found: {model_path}"
 
     model = joblib.load(model_path)

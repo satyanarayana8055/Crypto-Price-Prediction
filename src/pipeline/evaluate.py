@@ -7,7 +7,7 @@ import numpy as np
 from utils.logger import get_logger
 from config.config import DB_CONFIG, DATA_PATHS
 from pipeline.model import prepare_data
-from utils.helper import get_db_connection
+from utils.helper import get_db_connection, ensure_directory
 
 logger = get_logger("model")
 
@@ -47,6 +47,18 @@ def best_metrics(df: pd.DataFrame, coin: str) -> pd.DataFrame:
             header=False)
     else:
         best_metrics_df.to_csv(metrics_file, index=False, header=True)
+        
+    # Load the best model using its name
+    best_weight_name = best_metrics_df['name'].values[0]
+    model_path = os.path.join(DATA_PATHS['model_weight'],best_weight_name)
+    
+    # Ensure best_model directory exists
+    ensure_directory(DATA_PATHS['best_model'])
+
+    # Save the best model
+    best_model_path = os.path.join(DATA_PATHS['best_model'],best_weight_name)
+    best_model = joblib.load(model_path)
+    joblib.dump(best_model, best_model_path) 
 
 
 def mean_absolute_percentage_error(y_true, y_pred):

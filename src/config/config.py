@@ -65,6 +65,7 @@ DATA_PATHS = {
     "transfrom": BASE_DIR / "data" / "transfrom",
     "notify": BASE_DIR / "data" / "notify_json",
     "model_weight": BASE_DIR / "data" / "model" / "weight",
+    "best_model": BASE_DIR / "data" / "model" / "best_model",
     "model_metrics": BASE_DIR / "data" / "model" / "metrics",
     "drift_html": BASE_DIR / "data" / "monitor" / "drift",
     "perform_metrics": BASE_DIR / "data" / "monitor" / "performance",
