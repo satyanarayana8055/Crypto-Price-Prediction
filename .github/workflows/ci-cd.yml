@@ -32,11 +32,6 @@ jobs:
 
       - name: Run tests
         env: 
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_NAME: ${{ secrets.DB_NAME }}
           COINGECKO_COINS: bitcoin,cardano,ethereum,solana
 
         run: |

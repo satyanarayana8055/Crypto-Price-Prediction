@@ -43,7 +43,6 @@ services:
       - ./airflow/logs:/app/airflow/logs
       - ./src:/app/src
       - ./data:/app/data
-      - ./data/processed:/app/data/processed
       - ./airflow:/app/airflow 
     healthcheck: 
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -75,7 +74,6 @@ services:
       - ./airflow/logs:/app/airflow/logs
       - ./src:/app/src
       - ./data:/app/data
-      - ./data/processed:/app/data/processed
       - ./airflow:/app/airflow
 
     healthcheck: 

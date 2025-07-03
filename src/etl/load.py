@@ -23,7 +23,8 @@ def load_to_database(transformed_file: str):
                 volume REAL,
                 price_change_24h REAL,
                 price_change_percentage_24h REAL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE (coin, timestamp)
             )
         """
         create_table(create_query)
@@ -31,7 +32,8 @@ def load_to_database(transformed_file: str):
         insert_query = f"""INSERT INTO {table_name}
                     (coin, timestamp, price, market_cap,
                     volume, price_change_24h, price_change_percentage_24h)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s);
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (coin, timestamp) DO NOTHING;
                     """
         load_to_db(df, insert_query, table_name)
         logger.info(f"Loaded {len(df)} new records for {coin} to {table_name}")

@@ -13,9 +13,10 @@ from pipeline.model import prepare_data
 @pytest.mark.parametrize("coin", COINS)
 def test_model_prediction(coin):
     """Test model prediction for each coin"""
-    with get_db_connection(DB_CONFIG) as conn:
-        query = f"SELECT * FROM extract_features_{coin}"
-        df = pd.read_sql(query, conn)
+    features_path = os.path.join(
+        DATA_PATHS["extracted"], f"extract_features_{coin}.csv"
+    )
+    df = pd.read_csv(features_path)
 
     assert not df.empty, f"Loaded data is empty for coin: {coin}"
 
@@ -25,8 +26,7 @@ def test_model_prediction(coin):
     perf_path = os.path.join(
         DATA_PATHS["performance_metrics"], f"{coin}_performance_metrics.csv"
     )
-    assert os.path.exists(
-        perf_path), f"Performance metrics not found: {perf_path}"
+    assert os.path.exists(perf_path), f"Performance metrics not found: {perf_path}"
 
     best_model_df = pd.read_csv(perf_path)
     assert not best_model_df.empty, f"No performance data for: {coin}"

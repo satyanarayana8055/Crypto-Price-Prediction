@@ -63,6 +63,7 @@ LOG_CONFIG = {
 DATA_PATHS = {
     "raw": BASE_DIR / "data" / "raw",
     "transfrom": BASE_DIR / "data" / "transfrom",
+    "extracted": BASE_DIR / "data" / "extracted",
     "notify": BASE_DIR / "data" / "notify_json",
     "model_weight": BASE_DIR / "data" / "model" / "weight",
     "best_model": BASE_DIR / "data" / "model" / "best_model",

@@ -2,6 +2,7 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 import os
 import re
 import joblib
+import glob
 import pandas as pd
 import numpy as np
 from utils.logger import get_logger
@@ -40,34 +41,34 @@ def best_metrics(df: pd.DataFrame, coin: str) -> pd.DataFrame:
 
     # If file exists, append without header; otherwise, write with header
     if os.path.exists(metrics_file):
-        best_metrics_df.to_csv(
-            metrics_file,
-            mode="a",
-            index=False,
-            header=False)
+        best_metrics_df.to_csv(metrics_file, mode="a", index=False, header=False)
     else:
         best_metrics_df.to_csv(metrics_file, index=False, header=True)
 
     # Load the best model using its name
-    best_weight_name = best_metrics_df['name'].values[0]
-    model_path = os.path.join(DATA_PATHS['model_weight'], best_weight_name)
-    
+    best_weight_name = best_metrics_df["name"].values[0]
+    model_path = os.path.join(DATA_PATHS["model_weight"], best_weight_name)
+
     # Ensure best_model directory exists
-    ensure_directory(DATA_PATHS['best_model'])
+    ensure_directory(DATA_PATHS["best_model"])
+
+    # Deleting every thing before inserting new weights
+    for file in glob.glob(os.path.join(DATA_PATHS["best_model"], "*")):
+        os.remove(file)
 
     # Save the best model
-    best_model_path = os.path.join(DATA_PATHS['best_model'], best_weight_name)
+    best_model_path = os.path.join(DATA_PATHS["best_model"], best_weight_name)
     best_model = joblib.load(model_path)
-    joblib.dump(best_model, best_model_path) 
+    joblib.dump(best_model, best_model_path)
 
 
 def mean_absolute_percentage_error(y_true, y_pred):
     """Custom MAPE implementation (sklearn doesn't have built-in MAPE)"""
     y_true, y_pred = np.array(y_true), np.array(y_pred)
     non_zero = y_true != 0
-    mape = np.mean(
-        np.abs((y_true[non_zero] - y_pred[non_zero]) / y_true[non_zero])
-    ) * 100
+    mape = (
+        np.mean(np.abs((y_true[non_zero] - y_pred[non_zero]) / y_true[non_zero])) * 100
+    )
     return mape
 
 
@@ -83,10 +84,7 @@ def evaluate_model(coin: str) -> dict:
     model_files = sorted(
         model_dir.glob(f"{coin}_weight_*.pkl"), key=extract_weight_number
     )
-    metrics_path = os.path.join(
-        DATA_PATHS["model_metrics"],
-        f"{coin}_metrics.csv"
-    )
+    metrics_path = os.path.join(DATA_PATHS["model_metrics"], f"{coin}_metrics.csv")
 
     if not model_files:
         logger.warning(f"No versioned models found for {coin} in {model_dir}")
@@ -122,8 +120,7 @@ def evaluate_model(coin: str) -> dict:
             )
 
         except Exception as e:
-            logger.error(
-                f"measuring the performace of the model is failed {str(e)}")
+            logger.error(f"measuring the performace of the model is failed {str(e)}")
 
     # Save ONLY latest evaluation results (overwrite)
     df_metrics = pd.DataFrame(results)

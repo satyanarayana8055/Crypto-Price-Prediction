@@ -1,14 +1,16 @@
 """Extraction data for ML model"""
 
+import os
 import pandas as pd
 from utils.logger import get_logger
-from config.config import DB_CONFIG
+from config.config import DB_CONFIG, DATA_PATHS
 from utils.helper import (
     get_db_connection,
     load_to_db,
     truncate_table,
     create_table,
     is_new_data,
+    ensure_directory,
 )
 
 logger = get_logger("model")
@@ -21,8 +23,7 @@ def feature_engineering(df: pd.DataFrame):
     try:
         if not isinstance(df, pd.DataFrame):
             logger.error(f"Expected pandas DataFrame, got {type(df)}")
-            raise TypeError(
-                f"Input must be a pandas DataFrame, got {type(df)}")
+            raise TypeError(f"Input must be a pandas DataFrame, got {type(df)}")
         for lag in [1, 2, 3, 7, 14]:
             df[f"lag_{lag}"] = df["price"].shift(lag)
 
@@ -127,6 +128,18 @@ def extract_features(coin: str):
         return None
 
     cleaned_df = feature_engineering(df)
+    ensure_directory(DATA_PATHS["extracted"])
+    feature_path = os.path.join(
+        DATA_PATHS["extracted"], f"extracted_features_{coin}.csv"
+    )
+    file_exists = os.path.exists(feature_path)
+
+    cleaned_df.to_csv(
+        feature_path,
+        mode="a" if file_exists else "w",
+        header=not file_exists,
+        index=False,
+    )
 
     insert_query = f"""
         INSERT INTO {table_name} (date, price, coin, version,
@@ -147,5 +160,4 @@ def extract_features(coin: str):
     else:
         truncate_table(table_name)
         load_to_db(cleaned_df, insert_query, table_name)
-        logger.info(
-            f"Replaced {table_name} with initial cleaned data for {coin}")
+        logger.info(f"Replaced {table_name} with initial cleaned data for {coin}")
