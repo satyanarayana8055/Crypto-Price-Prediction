@@ -14,18 +14,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Load environment variables
 load_dotenv(dotenv_path=BASE_DIR / ".env")
 
-
-def validate_env_vars():
-    """Validate required environment variables"""
-    required_vars = ["DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT", "DB_NAME"]
-    missing = [var for var in required_vars if not os.getenv(var)]
-    if missing:
-        print(f"Missing enviroment variables: {missing}")
-        raise ValueError(f"Missing enviroment variables:{missing}")
-
-
-validate_env_vars()
-
 # Package constants
 # For code flexibilty we can add any coin name
 # without changing src code and it create the table for it
@@ -72,18 +60,14 @@ DATA_PATHS = {
     "perform_metrics": BASE_DIR / "data" / "monitor" / "performance",
 }
 
-THRESHOLDS = {
-    "mae": os.getenv("MAE"),
-    "mse": os.getenv("MSE"),
-    "r2": os.getenv("R2")}
+THRESHOLDS = {"mae": os.getenv("MAE"), "mse": os.getenv("MSE"), "r2": os.getenv("R2")}
 
 
 class Web:
     "WEB base configuration class"
 
     # Flask settings
-    SECRET_KEY = os.getenv(
-        "FLASK_SECRET_KEY") or "crypto-predict-secret-key-2025"
+    SECRET_KEY = os.getenv("FLASK_SECRET_KEY") or "crypto-predict-secret-key-2025"
 
     DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
     HOST = os.getenv("FLASK_HOST", "0.0.0.0")
