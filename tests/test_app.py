@@ -35,7 +35,7 @@ def test_settings_page(test_client):
 
 
 @pytest.mark.parametrize("coin", COINS)
-def test_get_supported_coins(test_client):
+def test_get_supported_coins(test_client, coin):
     response = test_client.get("/api/coins")
     assert response.status_code == 200
     data = response.get_json()
@@ -50,7 +50,7 @@ def test_get_prediction(test_client, coin):
     data = response.get_json()
     assert isinstance(data, dict)
 
-
+@pytest.mark.parametrize("coin", COINS)
 def test_get_model_metrics(test_client, coin):
     response = test_client.get(f"/api/model-metrics/{coin}")
     assert response.status_code in (200, 500)
