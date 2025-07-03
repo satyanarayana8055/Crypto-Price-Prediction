@@ -11,6 +11,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env: 
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      COINGECKO_COINS: bitcoin,cardano,ethereum,solana
     steps:
       - uses: actions/checkout@v3
 
@@ -31,9 +38,6 @@ jobs:
           flake8 src tests
 
       - name: Run tests
-        env: 
-          COINGECKO_COINS: bitcoin,cardano,ethereum,solana
-
         run: |
           pip install pytest
           pytest tests/
