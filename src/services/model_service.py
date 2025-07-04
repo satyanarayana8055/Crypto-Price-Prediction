@@ -29,7 +29,7 @@ class ModelService:
             # self.best_model[coin] = best_df["name"].iloc[-1]
 
             # Load the model file
-            model_path = os.path.join(DATA_PATHS["best_model"], f'{coin}_weight_*.csv')
+            model_path = os.path.join(DATA_PATHS["best_model"], f'{coin}_weight_*.pkl')
             if not os.path.exists(model_path):
                 raise FileNotFoundError(f"Model for {coin} not found")
             self.models[coin] = joblib.load(model_path)

@@ -97,15 +97,19 @@ cd to repo name
 conda create -n crypto python=3.10
 
 3. Create requirements.txt
-Next setup.py to make every script as package and for imports and Docker  
-Create setup.py file it is used to import every required file as module. we no need to mention complete import module for example 
-from src.scripts.data_ingestion import load_data
-we can write like this 
-from data_ingestion import load_data
-we can run pip install -e .
 
-4. Set up config.py file for modular coding and avoid hard coding and it is like a controler we can change main parmas here 
-pipeline_config.yaml is there for the pipeline line it human readable and userfor airflow and docker in any enviroment acceptable 
+Next, create a setup.py file to treat every script as a package — useful for cleaner imports and Docker compatibility.
+The setup.py file allows you to import any required file as a module. This means you no longer need to write the full import path.
+from src.scripts.data_ingestion import load_data
+from data_ingestion import load_data
+pip install -e .
+
+4. Set Up config.py and pipeline_config.yaml
+
+Create a config.py file to support modular coding and avoid hardcoding values across the project.
+This acts as a central controller, where all key parameters (like database credentials, file paths, API keys, etc.) can be managed and modified easily.
+Also, use pipeline_config.yaml to configure pipeline-related settings.
+This YAML file is human-readable, and it's especially useful for tools like Airflow and Docker, making your project environment-agnostic and easy to adapt for local or cloud deployment.
 
 5. Set up logger file it is very import to mention loggers in every peice of because it is import to track the flow and where we get the error because of logs we can do the debuging easily
 
@@ -113,47 +117,106 @@ pipeline_config.yaml is there for the pipeline line it human readable and userfo
 
 7. Set up gitigone file to ignore tracking of not need files and folders
 
-8. Set Up PostgreSQL 
+8. Set Up PostgreSQL (Optional for Local Testing Only)
+
+If you are testing your project locally without Docker, you can manually set up PostgreSQL on your system:
+🛠️ PostgreSQL Manual Setup Steps
+Switch to the Postgres user:
 sudo -i -u postgres
+Access the PostgreSQL shell:
 psql
--- Create user
+Create a new user and database:
+sql
+
+-- Create a user with a password
 CREATE USER api_user WITH PASSWORD '1234';
 
--- (Optional) Create a database and grant privileges
+-- Create a new database and assign ownership to the user
 CREATE DATABASE api_db OWNER api_user;
+
+-- Grant all privileges to the user
 GRANT ALL PRIVILEGES ON DATABASE api_db TO api_user;
 
-9. But as real world project we no need to create any db in local system we have to crate docker images for every data storage 
-how we can find the data in db first we have to execuite the image of the db 
-docker exec -it 2a347fe51d75 bash
-and then use the db crediential to login
+9. Database Setup in Real-World Projects (Using Docker)
+In real-world production environments, you should not create the database locally on your host machine. Instead, you should use Docker containers to run and manage all database services (e.g., PostgreSQL).
+🔍 Accessing and Exporting Data from Docker PostgreSQL
+To access your database and export data from within a container:
+Open a shell into the PostgreSQL container:
+docker exec -it <container_id_or_name> bash
+Log in to PostgreSQL using credentials:
 psql -U crypto_user -d crypto_db
-and fetch the data
-from docker we can get the csv file with this commands
-docker exec -it pg_container bash
-su - postgres
-psql
-\c crypto_db
-COPY transactions TO '/tmp/transactions.csv' WITH CSV HEADER;
-docker cp pg_container:/tmp/transactions.csv ./transactions.csv
 
-10. Airflow are are very crucial first make sure all the paths are proper and docker images and all the flow should be clear db is automatically crate all the data of images should maintain in the db of the docker image and it is very important that we have to mention the volumnes that are used in dags in folder that volumnes in docker file should be mention to import config all those things in the dags airflow should be very crucial on paths if we miss any thing it will break the pipeline and mention docker name before paths 
-when we want to store data into airflow we need to mention the database credentials in the airflow webserver use postgreshook for it and it also store the data in the docker postgres container
+Export data from any table (replace your_table_name.csv accordingly)
+COPY your_table_name TO '/tmp/your_table_name.csv' WITH CSV HEADER;
 
-11. After automation of tasks i need to build model pipeline in that task are older but i am using mlflow to compare model with different parameters and compare the perfromance it is very usefull
-
-12. Now comming Flask frmae work it is used to display all your hardwork in flask there is only read data is posible because it is runs only read the data not load 
-routes is endpoint api it is used to get the data from database used to display on the web
-This is the flow of the web frame work
-main.py  →  app.py  →  routes.py  →  services (like model_service.py, data_service.py)
-
-13. Docker is used to make use of different services airflow and mlflow and postgres and remeber on this if you store your data in postgres image you need to run container contineous to test you project in terminal  is not possible when you run it in docker container make sure that and create
-to many docker may need different Dockerfile if we are one it make leads to the compatilibilty issues with connect so use one entry point to manage all those sevices it should be bash script and coming to the volumns if you not mount it properly the data of you project to get used to the docker contianer
-
-14. Github Actions CI-CD if a differnt thing it works on two thing one is test and deploye one thing is remeber only data that is in local vscode or server like cloud only store so there is somany issues for to store the data in database of local or databases of container so make sure that data and then testing is nothing in future to make flow of the data in the same eithics as old and model training and app web also working as old and deployement to make complete project as image and contineous deployement in the dockerhub to make the image upto date this image is basically Flask image to run the project in web UI
-
-15. Monitoring project used with help of evidently it gives one html script when i post it in web using route it will display the distribution in the features and drifts and perfromance montiroing aslo there when you project metrics is drastically droped using web service get notification  to mail
+Copy the CSV file from the container to your local system:
+docker cp pg_container:/tmp/your_table_name.csv ./your_table_name.csv
 
 
+10. Airflow Integration and Best Practices
+Airflow plays a critical role in automating ETL, model training, and monitoring tasks. However, to ensure smooth execution, it's important to follow these best practices:
+
+✅ Correct Path Management: All paths referenced in Airflow DAGs (like for data, configs, or logs) must be correct and accessible within the Docker container. Inconsistent or incorrect paths will cause the pipeline to fail.
+✅ Docker Volumes: Make sure to mount volumes properly in docker-compose.yml so that the Airflow containers can access your DAGs, configuration files, and output directories.
+✅ Database Setup: Airflow creates and uses its metadata database automatically. If you want to store pipeline-related data (e.g., from ETL), make sure to:
+
+Use the PostgresHook in your Airflow tasks.
+Provide valid PostgreSQL database credentials in Airflow's webserver environment (via .env or airflow.cfg).
+Mount and connect to the PostgreSQL container running in Docker.
+🧠 If any path or volume is missed or incorrectly set, the DAGs will fail during execution. Always prefix container-level paths with the correct Docker volume name or Docker service path to avoid issues.
+
+
+11. Model Pipeline and MLflow Integration
+After automating the ETL and preprocessing tasks, the next step is to build the model pipeline. Although the structure and flow of tasks remain similar to previous steps, this stage focuses on training and evaluating machine learning models.
+
+To enhance this process, MLflow is integrated to:
+Track different experiments
+Compare models trained with various hyperparameters
+Log performance metrics and artifacts (like models, plots)
+Choose the best-performing model based on evaluation results
+
+✅ MLflow is extremely useful in experiment tracking and helps in selecting the best model for deployment with transparency and reproducibility.
+12. Flask Framework
+Flask is used in this project to expose all your data workflows, model predictions, and monitoring results through a simple web interface. It acts as the frontend for all your backend logic and machine learning pipelines.
+
+🔍 Note: Flask in this project primarily supports read operations — meaning it reads data from the database or files and displays it on the web. It doesn't perform heavy data loading or training directly.
+
+The routes (defined in routes.py) act as API endpoints. These routes retrieve data from the database or services and serve it to the web UI for display.
+
+🔁 Flask Workflow
+main.py  →  app.py  →  routes.py  →  services/
+                               ├── model_service.py
+                               ├── data_service.py
+                               └── notify_service.py
+
+main.py: Entry point for the Flask application
+app.py: Initializes the app and config
+routes.py: Defines API endpoints
+
+services/: Contains the business logic for fetching predictions, data, and notifications
+13. Docker is used in this project to orchestrate multiple services such as Airflow, MLflow, PostgreSQL, and the Flask web application.
+
+⚠️ Important Considerations:
+
+If you store your data inside the PostgreSQL Docker container, that container must remain running continuously — you cannot access or test data through the terminal after the container stops. This is a common issue when using containers for data persistence.
+
+If you plan to use multiple services (like Airflow, MLflow, and Flask), it's best to create separate Dockerfiles or services for each in your docker-compose.yml. Trying to run everything from a single Dockerfile can lead to compatibility and networking issues.
+
+To handle all services together, use a central bash script as the entry point. This script should orchestrate the startup of all services in the correct order.
+
+Finally, when using Docker, mount volumes properly. If volumes are not correctly mapped, the Docker containers will not have access to your project's data, configurations, or logs — leading to runtime errors or missing outputs.
+
+
+14. GitHub Actions CI/CD is a critical part of the project. It automates two main stages: testing and deployment.
+
+During testing, GitHub Actions ensures that the flow of data, model training, and web application behavior remains consistent with previous versions — this is crucial for maintaining reproducibility and stability.
+
+Deployment creates a full Docker image of the project, which is then pushed to Docker Hub for continuous delivery.
+
+⚠️ Note: GitHub Actions does not store data — it only works with what’s available in the local environment (VS Code) or on cloud storage/services. So, storing data in local databases or Docker container volumes can lead to issues if not handled properly. Ensure that critical data is persisted and available during workflow runs.
+
+The final image is a Flask-based Docker image that runs the entire project via a web UI and is kept up-to-date through automated CI/CD pipelines.
+
+15. The monitoring component of the project is implemented using Evidently. It generates an HTML report that displays feature distributions, data drift, and performance monitoring. When this HTML is rendered via a route in the web app, it visualizes these insights interactively. Additionally, if the model's performance metrics drop significantly, the web service sends an email notification alerting the user.
 
 
