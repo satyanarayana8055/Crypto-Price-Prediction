@@ -4,6 +4,7 @@ import joblib
 import pandas as pd
 import numpy as np
 import os
+import glob
 from typing import Dict
 from datetime import datetime
 from utils.logger import get_logger
@@ -14,25 +15,21 @@ logger = get_logger("service")
 
 class ModelService:
     def __init__(self):
-        self.model_path = DATA_PATHS["model_weight"]
+        self.model_path = DATA_PATHS["best_model"]
         self.metrics_path = DATA_PATHS["model_metrics"]
         self.models = {}
+        self.best_model = {}
 
     def load_models(self, coin: str):
         """Load XGBoost models for each coin"""
         try:
-            # Load best model name from performance metrics
-            # best_model_path = os.path.join(
-            #     DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"
-            # )
-            # best_df = pd.read_csv(best_model_path)
-            # self.best_model[coin] = best_df["name"].iloc[-1]
-
             # Load the model file
-            model_path = os.path.join(DATA_PATHS["best_model"], f'{coin}_weight_*.pkl')
-            if not os.path.exists(model_path):
-                raise FileNotFoundError(f"Model for {coin} not found")
-            self.models[coin] = joblib.load(model_path)
+            model_pattern = os.path.join(self.model_path, f'{coin}_weight_*.pkl')
+            model_files = glob.glob(model_pattern)
+            if not model_files:
+                raise FileNotFoundError(f"No weights found for {coin}")
+            model_file = model_files[0]
+            self.models[coin] = joblib.load(model_file)
             return self.models[coin]
 
         except Exception as e:
@@ -124,6 +121,13 @@ class ModelService:
     def get_metrics(self, coin: str = "bitcoin"):
         """Get model performance metrics"""
         try:
+            # Load best model name from performance metrics
+            best_model_path = os.path.join(
+                DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"
+            )
+            best_df = pd.read_csv(best_model_path)
+            self.best_model[coin] = best_df["name"].iloc[-1]
+            
             metrics_file = os.path.join(self.metrics_path, f"{coin}_metrics.csv")
             df = pd.read_csv(metrics_file)
 
