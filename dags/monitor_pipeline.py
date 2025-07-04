@@ -2,8 +2,8 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import yaml
-from monitoring.drift_analysis import analyze_drift
-from monitoring.performance_metrics import monitor_metrics
+from monitor.drift_analysis import analyze_drift
+from monitor.performance_metrics import monitor_metrics
 from utils.logger import get_logger
 
 logger = get_logger("monitor_pipeline")

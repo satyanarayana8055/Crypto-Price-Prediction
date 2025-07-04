@@ -17,7 +17,6 @@ class ModelService:
         self.model_path = DATA_PATHS["model_weight"]
         self.metrics_path = DATA_PATHS["model_metrics"]
         self.models = {}
-        self.best_model = {}
 
     def load_models(self, coin: str):
         """Load XGBoost models for each coin"""
@@ -30,7 +29,7 @@ class ModelService:
             # self.best_model[coin] = best_df["name"].iloc[-1]
 
             # Load the model file
-            model_path = os.path.join(DATA_PATHS["model_weight"], self.best_model[coin])
+            model_path = os.path.join(DATA_PATHS["best_model"], f'{coin}_weight_*.csv')
             if not os.path.exists(model_path):
                 raise FileNotFoundError(f"Model for {coin} not found")
             self.models[coin] = joblib.load(model_path)
