@@ -23,11 +23,11 @@ class ModelService:
         """Load XGBoost models for each coin"""
         try:
             # Load best model name from performance metrics
-            best_model_path = os.path.join(
-                DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"
-            )
-            best_df = pd.read_csv(best_model_path)
-            self.best_model[coin] = best_df["name"].iloc[-1]
+            # best_model_path = os.path.join(
+            #     DATA_PATHS["perform_metrics"], f"{coin}_performance_metrics.csv"
+            # )
+            # best_df = pd.read_csv(best_model_path)
+            # self.best_model[coin] = best_df["name"].iloc[-1]
 
             # Load the model file
             model_path = os.path.join(DATA_PATHS["model_weight"], self.best_model[coin])
@@ -53,6 +53,7 @@ class ModelService:
                 DATA_PATHS["extracted"], f"extracted_features_{coin}.csv"
             )
             df = pd.read_csv(features_path)
+            df.dropna(inplace=True)
             return df
         except Exception as e:
             logger.error(f"Error preparing features: {e}")

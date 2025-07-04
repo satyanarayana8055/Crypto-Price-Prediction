@@ -21,8 +21,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the code
 COPY . .
 
-# Add this line to copy your data folder into the image
-COPY data/ /app/data/
 
 # Set environment variable
 ENV PYTHONPATH=/app:/app/src
